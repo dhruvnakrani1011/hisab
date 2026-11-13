@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="gu"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Party Hisab</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e8ecf3;--pri:#4f46e5;--priL:#eef0ff;--mail:#f3f7ff;--pay:#effaf3;--ext:#fff8e6;--ok:#16a34a;--red:#e11d48;--side:#0f172a;--sh:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06)}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1020;--card:#131a2b;--ink:#e8ecf6;--mut:#94a3b8;--line:#222c42;--pri:#818cf8;--priL:#232b52;--mail:#16233d;--pay:#12281d;--ext:#2f2a14;--ok:#4ade80;--red:#fb7185;--side:#0a0f1d}}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{position:fixed;inset:0 auto 0 0;width:208px;z-index:5;display:flex;flex-direction:column;gap:6px;padding:22px 14px;background:var(--side);color:#cbd5e1}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:#fff;padding:0 8px 20px}
+.logo:before{content:"\20B9";display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
+nav{display:flex;flex-direction:column;gap:4px;flex:1}
+nav button{text-align:left;border:0;background:none;color:#94a3b8;padding:11px 14px;border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+nav button:hover{background:rgba(255,255,255,.07);color:#fff}
+nav button.on{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;box-shadow:0 6px 16px rgba(79,70,229,.35)}
+#who{font-size:12px;color:#94a3b8;padding:0 8px;word-break:break-all}
+header .btn{background:rgba(255,255,255,.08);border:0;color:#e2e8f0}
+button{font:inherit;cursor:pointer;color:var(--ink)}.btn{border:1px solid var(--line);background:var(--card);padding:9px 16px;border-radius:10px}
+.pri{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:0;padding:10px 22px;border-radius:10px;font-weight:600;box-shadow:0 6px 16px rgba(79,70,229,.3)}
+main{margin-left:208px;padding:24px 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:var(--sh)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--sh);position:relative}
+.stat small{color:var(--mut);font-weight:600}.stat b{display:block;font-size:24px;margin-top:4px;letter-spacing:-.5px}
+.si{position:absolute;right:14px;top:14px;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-weight:800;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin:10px 0 5px}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+input:focus,select:focus{outline:3px solid var(--priL);border-color:var(--pri)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0 14px}
+.bar{display:flex;gap:12px;flex-wrap:wrap;align-items:end}.bar>div{flex:1;min-width:200px}.bar label{margin-top:0}
+.chk{display:flex;gap:7px;align-items:center;font-size:13px;color:var(--mut);padding-bottom:10px;flex:0!important;min-width:auto!important;white-space:nowrap}.chk input{width:auto}
+.wrap{overflow:auto;max-height:70vh;border-radius:12px}table{border-collapse:separate;border-spacing:0;width:100%;min-width:860px}
+th{position:sticky;top:0;background:var(--priL);color:var(--pri);text-align:left;padding:11px 12px;white-space:nowrap;font-size:11px;text-transform:uppercase;letter-spacing:.6px;font-weight:700}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+tr.MAIL td{background:var(--mail)}tr.PAYMENT td{background:var(--pay)}tr.EXTRA td{background:var(--ext)}
+tr.m td:first-child{box-shadow:inset 4px 0 0 var(--ok)}tr.s td{background:var(--card);font-weight:700}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}.kpi small{color:var(--mut);font-weight:600}.kpi b{display:block;font-size:22px;margin-top:3px;letter-spacing:-.4px}.kpi i{font-size:12px;color:var(--mut);font-style:normal}
+.neg{color:var(--red)}.hide{display:none!important}
+.av{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--priL);color:var(--pri);font-weight:700;font-size:12px;margin-right:9px;vertical-align:middle}
+.ch{display:inline-block;font-size:10px;font-weight:700;border-radius:6px;padding:1px 6px;margin-right:6px;text-transform:uppercase;letter-spacing:.4px}.ch.p{background:var(--ok);color:#fff}.ch.e{background:#f59e0b;color:#fff}
+.tag{display:inline-block;font-size:11px;font-weight:700;color:var(--ok);background:var(--card);border:1px solid var(--ok);border-radius:10px;padding:0 8px;margin-left:6px}
+.note{display:block;font-size:12px;color:var(--mut);font-style:italic}
+.ic{border:1px solid var(--line);background:var(--card);border-radius:8px;width:27px;height:27px;margin-left:2px;line-height:1}.ic:hover{border-color:var(--pri)}.ic.ok{background:var(--ok);color:#fff;border-color:var(--ok)}.ic.del{color:var(--red)}
+@media screen{#led thead th:nth-child(2),#lb td:nth-child(2){display:none}}#lb td:nth-child(3){min-width:180px}#led td,#led th{padding:9px 8px}.card.wrap{padding:0;overflow:auto;max-height:calc(100vh - 330px);min-height:300px}
+#stot td{position:sticky;top:calc(var(--h,38px) - 1px);z-index:3;background:var(--card);font-weight:700;border-bottom:2px solid var(--line)}
+th{z-index:4}
+.ent-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start;max-width:1000px}
+.seg{display:flex;background:var(--bg);border-radius:12px;padding:4px;gap:4px;margin-bottom:6px}.seg button{flex:1;border:0;background:none;padding:10px;border-radius:9px;font-weight:600;color:var(--mut)}.seg button.on{background:var(--card);color:var(--pri);box-shadow:var(--sh)}
+.sidep small{color:var(--mut);font-weight:600}.sidep b{display:block;font-size:26px;letter-spacing:-.5px;margin:2px 0 4px}.sidep hr{border:0;border-top:1px dashed var(--line);margin:14px 0}.sidep i{font-size:12px;color:var(--mut);font-style:normal}
+.newp{display:block;margin-top:6px;font-size:12px;color:#b45309;background:var(--ext);border-radius:8px;padding:6px 10px}
+@media(max-width:900px){.ent-grid{grid-template-columns:1fr}.card.wrap{max-height:none}}
+#msg{min-height:20px;margin:0 0 10px;color:var(--mut)}#msg.bad{color:var(--red)}
+a.pn{color:var(--ink);font-weight:600;cursor:pointer;text-decoration:none}a.pn:hover{color:var(--pri)}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:20px;width:min(460px,94vw)}dialog::backdrop{background:rgba(15,23,42,.5)}.warn{background:var(--ext);border-radius:10px;padding:9px 11px;font-size:12px;margin-top:8px}
+#login{min-height:100vh;display:grid;place-items:center;background:radial-gradient(900px 500px at 15% 0,#c7d2fe 0,transparent 60%),radial-gradient(800px 500px at 100% 100%,#ddd6fe 0,transparent 60%),var(--bg)}
+#login main{margin:0;padding:16px;width:min(400px,100%)}#login .logo{color:var(--ink);padding:0 0 14px}
+@media(max-width:900px){header{position:sticky;inset:auto;top:0;width:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:10px 12px}.logo{padding:0}nav{flex-direction:row;overflow:auto;flex:1 1 100%;order:3}main{margin-left:0;padding:14px}}
+@media print{header,.noprint,#msg,.stats{display:none!important}body{background:#fff;color:#000}main{margin:0;padding:0}.card{box-shadow:none;border:0;padding:0}.wrap{max-height:none;overflow:visible}td,th{font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+
+<section id="login" class="hide"><main><div class="card">
+<div class="logo" style="font-size:22px">Party Hisab</div>
+<div id="urlrow"><label>Google Web App URL</label><input id="au" placeholder="https://script.google.com/macros/s/.../exec"></div>
+<label>Password</label><input id="pw" type="password" onkeydown="if(event.key==='Enter')signIn()">
+<p><button class="pri" style="width:100%" onclick="signIn()">Open</button></p><div id="lerr" class="neg"></div></div></main></section>
+
+<section id="app" class="hide">
+<header><span class="logo">Party Hisab</span>
+<nav><button data-t="sum">&#9638;&nbsp; Summary</button><button data-t="led">&#9776;&nbsp; Ledger</button><button data-t="ent">&#65291;&nbsp; New Entry</button></nav>
+<span id="who">Owner</span><button class="btn" onclick="backup()">Backup</button><button class="btn" onclick="logout()">Lock</button></header>
+<main><div id="msg"></div>
+
+<div id="sum" class="tab hide">
+<div class="stats"><div class="stat"><span class="si" style="--c:#e11d48">&#8377;</span><small>Total Pending</small><b id="s1">-</b></div>
+<div class="stat"><span class="si" style="--c:#4f46e5">&#8593;</span><small>Total Purchase</small><b id="s2">-</b></div>
+<div class="stat"><span class="si" style="--c:#16a34a">&#8595;</span><small>Payment Received</small><b id="s3">-</b></div>
+<div class="stat"><span class="si" style="--c:#f59e0b">&#9679;</span><small>Parties</small><b id="s4">-</b></div></div>
+<div class="card bar noprint"><div><label>Party shodho</label><input id="sq" placeholder="naam lakho..." oninput="drawSummary()"></div>
+<label class="chk"><input type="checkbox" id="sp" onchange="drawSummary()"> Pending vala j</label></div>
+<div class="card wrap"><table><thead><tr><th>Party</th><th class="n">Opening</th><th class="n">Purchase</th><th class="n">Extra</th><th class="n">Cash</th><th class="n">Bank</th><th class="n">Final Pending</th></tr><tr class="s" id="stot"></tr></thead><tbody id="sb"></tbody></table></div></div>
+
+<div id="led" class="tab hide">
+<div class="card bar noprint"><div><label>Party</label><input id="lp" list="plist2" placeholder="party nu naam lakho / select karo" onchange="loadLedger()"></div>
+<button class="btn" onclick="window.print()">Print / PDF</button></div>
+<div class="card kpi"><div><small>Party</small><b id="k0">-</b></div><div><small>Opening Balance</small><b id="k1">-</b></div>
+<div><small>Final Pending</small><b id="k2">-</b></div><div><small>Last Matched</small><b id="k3">-</b><i id="k4"></i></div></div>
+<div class="card wrap"><table><thead><tr><th>Date</th><th>Party Name</th><th>Product Name</th><th class="n">Cartoon</th><th class="n">Cartoon Pcs</th><th class="n">Original Price</th><th class="n">Original Total</th><th class="n">Cash Payment</th><th class="n">Bank Payment</th><th class="n">Pending</th><th class="noprint act"></th></tr></thead><tbody id="lb"></tbody></table></div></div>
+
+<div id="ent" class="tab hide"><div class="ent-grid noprint">
+<div class="card"><div class="seg" id="seg"><button data-k="mail" class="on">Mail Entry</button><button data-k="pay">Payment</button><button data-k="ext">Extra Charge</button></div><input type="hidden" id="kind" value="mail">
+<div class="grid"><div><label>Date</label><input id="f_date" type="date"></div><div><label>Party</label><input id="f_party" list="plist2" placeholder="party select karo" oninput="prev()"></div></div>
+<div id="g_mail"><label>Product</label><input id="f_prod" list="plist" autocomplete="off" placeholder="product shodho ke navu lakho" oninput="prev()">
+<span id="np" class="newp hide">+ Navu product che. Save karta j product list ma add thai jase.</span>
+<div class="grid"><div><label>Cartoon</label><input id="f_c" type="number" step="any" oninput="prev()"></div><div><label>Cartoon Pcs</label><input id="f_p" type="number" step="any" oninput="prev()"></div><div><label>Price (mail price)</label><input id="f_pr" type="number" step="any" oninput="prev()"></div></div></div>
+<div id="g_pay" class="hide"><div class="grid"><div><label>Amount</label><input id="f_amt" type="number" step="any" oninput="prev()"></div><div><label>Mode</label><select id="f_mode"><option>CASH</option><option>BANK</option></select></div></div></div>
+<div id="g_ext" class="hide"><label>Charge type</label><select id="f_ct"><option>Transport Charges</option><option>Other Charges</option></select></div>
+<div id="g_rem" class="hide"><label>Remark</label><input id="f_rem"></div>
+<p style="margin-bottom:0"><button class="pri" style="width:100%;padding:13px" onclick="saveEntry()">Save Entry</button></p></div>
+<div class="card sidep"><small>Original Total</small><b id="pvT">&#8377; 0.00</b><i id="pvF"></i><hr><small>Party Pending (atyare)</small><b id="pcur">-</b><small>Aa entry pachi</small><b id="pnew">-</b></div>
+</div></div>
+<dialog id="dlg"><b id="dt" style="font-size:16px">Entry edit</b><div id="df"></div><div id="dw" class="warn hide">Aa entry "Matched" che. Edit karso to mark kadhi nakhase.</div><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#dlg').close()">Cancel</button> <button class="pri" onclick="saveEdit()">Save</button></p></dialog>
+<datalist id="plist"></datalist><datalist id="plist2"></datalist>
+</main></section>
+
+<script>
+const $=s=>document.querySelector(s);
+const fmt=n=>Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fd=s=>s?String(s).slice(0,10).split('-').reverse().join('/'):'';
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const say=(t,bad)=>{$('#msg').textContent=t||'';$('#msg').className=bad?'bad':'';};
+const nowIso=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,19);
+//CALC-START
+const num=v=>Number(v)||0, live=r=>!r.deleted_at, ORD={MAIL:1,EXTRA:2,PAYMENT:3};
+function calc(D,mult){
+  const S={}; D.parties.forEach(p=>S[p.name]={party_id:p.name,party_name:p.name,opening_balance:num(p.opening_balance),main_purchase:0,extra_charges:0,cash_payment:0,bank_payment:0});
+  D.mail.filter(live).forEach(r=>{const s=S[r.party]; if(s) s.main_purchase+=num(r.cartons)*num(r.pcs)*num(r.price)*mult;});
+  D.ext.filter(live).forEach(r=>{const s=S[r.party]; if(s) s.extra_charges+=num(r.amount);});
+  D.pay.filter(live).forEach(r=>{const s=S[r.party]; if(!s) return; if(String(r.mode).toUpperCase()==='BANK') s.bank_payment+=num(r.amount); else s.cash_payment+=num(r.amount);});
+  return Object.values(S).map(s=>({...s,final_pending:s.opening_balance+s.main_purchase+s.extra_charges-s.cash_payment-s.bank_payment})).sort((a,b)=>a.party_name.localeCompare(b.party_name));
+}
+function ledgerRows(D,mult,name,opening){
+  const o=[];
+  D.mail.filter(r=>live(r)&&r.party===name).forEach(r=>o.push({kind:'MAIL',id:r.id,date:r.date,remark:r.product,cartons:num(r.cartons),pcs:num(r.pcs),price:num(r.price)*mult,total:num(r.cartons)*num(r.pcs)*num(r.price)*mult,payment:0,mode:null,m:r.matched_at,note:r.note,c:r.created_at||'',seq:r._r}));
+  D.ext.filter(r=>live(r)&&r.party===name).forEach(r=>o.push({kind:'EXTRA',id:r.id,date:r.date,remark:((r.charge_type||'')+' '+(r.remark||'')).trim(),cartons:0,pcs:0,price:0,total:num(r.amount),payment:0,mode:null,m:r.matched_at,note:r.note,c:r.created_at||'',seq:r._r}));
+  D.pay.filter(r=>live(r)&&r.party===name).forEach(r=>o.push({kind:'PAYMENT',id:r.id,date:r.date,remark:r.remark,cartons:0,pcs:0,price:0,total:0,payment:num(r.amount),mode:String(r.mode).toUpperCase(),m:r.matched_at,note:r.note,c:r.created_at||'',seq:r._r}));
+  o.sort((a,b)=>(a.date<b.date?-1:a.date>b.date?1:0)||ORD[a.kind]-ORD[b.kind]||(a.c<b.c?-1:a.c>b.c?1:0)||a.seq-b.seq);
+  let p=opening; o.forEach(r=>{p+=r.total-r.payment; r.pending=p;}); return o;
+}
+//CALC-END
+let API=localStorage.getItem('gs_url')||'', KEY=localStorage.getItem('gs_key')||'';
+let D={parties:[],products:[],mail:[],pay:[],ext:[],mult:4}, parties=[], mult=4, ed=null, prodSet=new Set();
+const SHEET={MAIL:'Mail',PAYMENT:'Payments',EXTRA:'Extra'}, LIST={MAIL:'mail',PAYMENT:'pay',EXTRA:'ext'};
+const pname=v=>{const x=D.parties.find(p=>p.name.toLowerCase()===String(v).trim().toLowerCase());return x?x.name:null;};
+
+async function call(action,p={}){
+  const r=await fetch(API,{method:'POST',body:JSON.stringify({key:KEY,action,...p})});
+  let j; try{ j=await r.json(); }catch(e){ throw new Error('Server no jawab samjayo nahi. Web App URL check karo.'); }
+  if(!j.ok) throw new Error(j.error); return j.data;
+}
+async function signIn(){
+  API=$('#au').value.trim()||API; KEY=$('#pw').value||KEY; $('#lerr').textContent='Checking...';
+  try{ await start(); localStorage.setItem('gs_url',API); localStorage.setItem('gs_key',KEY); }
+  catch(e){ $('#lerr').textContent=e.message; $('#login').classList.remove('hide'); $('#app').classList.add('hide'); }
+}
+function logout(){ localStorage.removeItem('gs_key'); location.reload(); }
+function tab(t){ document.querySelectorAll('.tab').forEach(e=>e.classList.add('hide')); $('#'+t).classList.remove('hide');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); say(''); }
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ tab(b.dataset.t); if(b.dataset.t==='sum') drawSummary(); });
+
+async function start(){
+  D=await call('getAll'); mult=D.mult||4; refresh();
+  $('#login').classList.add('hide'); $('#app').classList.remove('hide');
+  prodSet=new Set(D.products.map(p=>String(p.name).toUpperCase()));
+  $('#plist').innerHTML=D.products.map(p=>`<option value="${esc(p.name)}">`).join('');
+  $('#f_date').valueAsDate=new Date(); kindUI(); tab('sum'); drawSummary();
+}
+function refresh(){ parties=calc(D,mult); $('#plist2').innerHTML=parties.map(p=>`<option value="${esc(p.party_name)}">`).join(''); }
+
+function drawSummary(){
+  const S=k=>parties.reduce((a,p)=>a+Number(p[k]||0),0);
+  $('#s1').textContent='\u20B9 '+fmt(S('final_pending')); $('#s2').textContent='\u20B9 '+fmt(S('main_purchase')+S('extra_charges'));
+  $('#s3').textContent='\u20B9 '+fmt(S('cash_payment')+S('bank_payment')); $('#s4').textContent=parties.length;
+  const q=$('#sq').value.trim().toLowerCase(), onlyP=$('#sp').checked;
+  const L=parties.filter(p=>p.party_name.toLowerCase().includes(q)&&(!onlyP||Math.abs(p.final_pending)>0.005));
+  const T=k=>L.reduce((a,p)=>a+Number(p[k]||0),0);
+  const row=(n,o,m,e,c,b,f,tot)=>`<td>${tot?'TOTAL ('+L.length+')':`<span class="av">${esc(n).charAt(0).toUpperCase()}</span><a class="pn" onclick="openLedger(this.dataset.n)" data-n="${esc(n)}">${esc(n)}</a>`}</td><td class="n">${fmt(o)}</td><td class="n">${fmt(m)}</td><td class="n">${fmt(e)}</td><td class="n">${fmt(c)}</td><td class="n">${fmt(b)}</td><td class="n ${f<0?'neg':''}"><b>${fmt(f)}</b></td>`;
+  $('#stot').innerHTML=row('',T('opening_balance'),T('main_purchase'),T('extra_charges'),T('cash_payment'),T('bank_payment'),T('final_pending'),1);
+  $('#sb').innerHTML=L.map(p=>'<tr>'+row(p.party_name,p.opening_balance,p.main_purchase,p.extra_charges,p.cash_payment,p.bank_payment,p.final_pending,0)+'</tr>').join('');
+  $('#sum .wrap').style.setProperty('--h',($('#sum thead th').offsetHeight||38)+'px');
+}
+function openLedger(name){ $('#lp').value=name; tab('led'); loadLedger(); }
+
+function loadLedger(){
+  const name=pname($('#lp').value); if(!name){ $('#lb').innerHTML=''; return say($('#lp').value?'Aa naam ni party nathi':'',true); }
+  const p=parties.find(x=>x.party_name===name), rows=ledgerRows(D,mult,name,p.opening_balance);
+  $('#k0').textContent=name; $('#k1').textContent=fmt(p.opening_balance);
+  $('#k2').textContent=fmt(p.final_pending); $('#k2').className=p.final_pending<0?'neg':'';
+  const lm=[...rows].reverse().find(r=>r.m);
+  if(lm){ $('#k3').textContent=fd(lm.date); $('#k4').textContent='Pending tyare: '+fmt(lm.pending)+' · pachi '+(rows.length-1-rows.lastIndexOf(lm))+' entry'; }
+  else { $('#k3').textContent='-'; $('#k4').textContent='Hajji koi mark nathi'; }
+  $('#lb').innerHTML=rows.map(r=>{
+    const act=`<button class="ic ${r.m?'ok':''}" title="Match mark" onclick="mark('${r.kind}','${r.id}',${!!r.m})">✓</button><button class="ic" title="Edit entry" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic" title="Note" data-n="${esc(r.note)}" onclick="editNote('${r.kind}','${r.id}',this)">💬</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button>`;
+    return `<tr class="${r.kind} ${r.m?'m':''}"><td>${fd(r.date)}</td><td>${esc(name)}</td>
+    <td>${r.kind==='PAYMENT'?'<span class="ch p">Payment</span>':r.kind==='EXTRA'?'<span class="ch e">Extra</span>':''}${esc(r.remark)}${r.m?`<span class="tag">✓ Matched ${fd(r.m)}</span>`:''}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
+    <td class="n">${r.cartons}</td><td class="n">${r.pcs}</td><td class="n">${fmt(r.price)}</td><td class="n">${fmt(r.total)}</td>
+    <td class="n">${fmt(r.mode==='CASH'?r.payment:0)}</td><td class="n">${fmt(r.mode==='BANK'?r.payment:0)}</td>
+    <td class="n"><b>${fmt(r.pending)}</b></td><td class="noprint n">${act}</td></tr>`}).join('');
+  say(rows.length+' entries · ✓ match mark, ✎ edit, 💬 note, × delete');
+}
+async function upd(kind,id,patch){
+  try{ const row=await call('update',{sheet:SHEET[kind],id,patch}); const L=D[LIST[kind]], i=L.findIndex(x=>x.id===id); if(i>=0) L[i]={...L[i],...row}; refresh(); return true; }
+  catch(e){ say(e.message,true); return false; }
+}
+async function mark(kind,id,on){ if(await upd(kind,id,{matched_at:on?'':nowIso()})) loadLedger(); }
+async function editNote(kind,id,el){ const t=prompt('Note (khali rakho to kadhi nakhse):',el.dataset.n||''); if(t===null) return;
+  if(await upd(kind,id,{note:t.trim()})) loadLedger(); }
+async function del(kind,id){
+  if(!confirm('Aa entry delete karvi? (sheet ma deleted_at ma save rahe che, pachi male)')) return;
+  if(await upd(kind,id,{deleted_at:nowIso()})) loadLedger();
+}
+async function editRow(kind,id){
+  const r=D[LIST[kind]].find(x=>x.id===id); if(!r) return;
+  ed={kind,id,matched:!!r.matched_at};
+  const f=(l,i,v,t,x)=>`<label>${l}</label><input id="e_${i}" type="${t||'text'}" value="${esc(v)}" ${x||''}>`;
+  let h=f('Date','date',String(r.date).slice(0,10),'date')+f('Party','party',r.party,'text','list="plist2"');
+  if(kind==='MAIL') h+=f('Product','prod',r.product,'text','list="plist"')+f('Cartoon','c',r.cartons,'number','step="any"')+f('Cartoon Pcs','p',r.pcs,'number','step="any"')+f('Price (mail price)','pr',r.price,'number','step="any"');
+  else { h+=f('Amount','amt',r.amount,'number','step="any"');
+    h+=kind==='PAYMENT'?`<label>Mode</label><select id="e_mode"><option ${String(r.mode).toUpperCase()==='CASH'?'selected':''}>CASH</option><option ${String(r.mode).toUpperCase()==='BANK'?'selected':''}>BANK</option></select>`:f('Charge type','ct',r.charge_type||'');
+    h+=f('Remark','rem',r.remark||''); }
+  $('#dt').textContent={MAIL:'Mail Entry',PAYMENT:'Payment',EXTRA:'Extra Charge'}[kind]+' edit';
+  $('#df').innerHTML=h; $('#dw').classList.toggle('hide',!ed.matched); $('#dlg').showModal();
+}
+async function saveEdit(){
+  const g=i=>$('#e_'+i).value, party=pname(g('party'));
+  if(!g('date')||!party) return alert('Date ane party list ma thi barabar select karo');
+  const patch={date:g('date'),party};
+  if(ed.kind==='MAIL'){ if(!g('prod').trim()) return alert('Product lakho'); Object.assign(patch,{product:g('prod').trim(),cartons:+g('c')||0,pcs:+g('p')||0,price:+g('pr')||0}); }
+  else { const a=+g('amt'); if(!a) return alert('Amount lakho'); Object.assign(patch,{amount:a,remark:g('rem').trim()});
+    if(ed.kind==='PAYMENT') patch.mode=g('mode'); else patch.charge_type=g('ct').trim(); }
+  if(ed.matched) patch.matched_at='';
+  if(await upd(ed.kind,ed.id,patch)){ $('#dlg').close(); loadLedger(); drawSummary(); say('✓ Edit thayu'); }
+}
+
+function kindUI(){ const k=$('#kind').value;
+  $('#g_mail').classList.toggle('hide',k!=='mail'); $('#g_pay').classList.toggle('hide',k!=='pay');
+  $('#g_ext').classList.toggle('hide',k!=='ext'); $('#g_rem').classList.toggle('hide',k==='mail'); }
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{ $('#kind').value=b.dataset.k;
+  document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x===b)); kindUI(); prev(); });
+function prev(){
+  const k=$('#kind').value, p=parties.find(x=>x.party_name===pname($('#f_party').value));
+  const amt=k==='mail'?(+$('#f_c').value||0)*(+$('#f_p').value||0)*(+$('#f_pr').value||0)*mult:(+$('#f_amt').value||0);
+  const cur=p?Number(p.final_pending):null;
+  $('#pvT').textContent='\u20B9 '+fmt(amt);
+  $('#pvF').textContent=k==='mail'?'Cartoon \u00D7 Pcs \u00D7 Price \u00D7 '+mult:k==='pay'?'Payment: pending ghatse':'Extra charge: pending vadhse';
+  $('#pcur').textContent=cur===null?'-':'\u20B9 '+fmt(cur); $('#pnew').textContent=cur===null?'-':'\u20B9 '+fmt(k==='pay'?cur-amt:cur+amt);
+  const pn=$('#f_prod').value.trim(); $('#np').classList.toggle('hide',!(k==='mail'&&pn&&!prodSet.has(pn.toUpperCase())));
+}
+async function saveEntry(){
+  const k=$('#kind').value, date=$('#f_date').value; let party=pname($('#f_party').value), sheet, row;
+  if(!date) return say('Date jaruri che',true);
+  if(!party){ const nm=$('#f_party').value.trim(); if(!nm) return say('Party lakho',true);
+    if(!confirm('"'+nm+'" navi party che. Party list ma add karvi?')) return;
+    try{ const pr=await call('add',{sheet:'Parties',row:{name:nm,opening_balance:0}}); D.parties.push(pr); refresh(); party=nm; }catch(e){ return say(e.message,true); } }
+  if(k==='mail'){ sheet='Mail'; const pn=$('#f_prod').value.trim(); if(!pn) return say('Product lakho',true);
+    row={date,party,product:pn,cartons:+$('#f_c').value||0,pcs:+$('#f_p').value||0,price:+$('#f_pr').value||0}; }
+  else if(k==='pay'){ sheet='Payments'; const a=+$('#f_amt').value; if(!a) return say('Amount lakho',true);
+    row={date,party,amount:a,mode:$('#f_mode').value,remark:$('#f_rem').value.trim()}; }
+  else { sheet='Extra'; const a=+$('#f_amt').value; if(!a) return say('Amount lakho',true);
+    row={date,party,charge_type:$('#f_ct').value,amount:a,remark:$('#f_rem').value.trim()}; }
+  say('Saving...');
+  try{
+    const saved=await call('add',{sheet,row}); D[{Mail:'mail',Payments:'pay',Extra:'ext'}[sheet]].push(saved);
+    let extra='';
+    if(k==='mail'&&!prodSet.has(row.product.toUpperCase())){
+      try{ const pr=await call('add',{sheet:'Products',row:{name:row.product}}); D.products.push(pr); prodSet.add(row.product.toUpperCase()); $('#plist').insertAdjacentHTML('beforeend',`<option value="${esc(row.product)}">`); extra=' · navu product list ma add thayu'; }catch(e){ extra=' · (product list ma add na thayu)'; }
+    }
+    refresh(); say('✓ Saved'+extra); ['f_prod','f_c','f_p','f_pr','f_amt','f_rem'].forEach(i=>$('#'+i).value=''); prev(); if(k==='mail') $('#f_prod').focus();
+  }catch(e){ say('Save na thayu: '+e.message,true); }
+}
+async function backup(){ say('Backup banavi rahyo chu...'); try{ const n=await call('backup'); say('✓ Backup bani: '+n+' (Google Drive ma)'); }catch(e){ say(e.message,true); } }
+
+if(API&&KEY){ $('#au').value=API; $('#pw').value=KEY; signIn(); } else { $('#login').classList.remove('hide'); if(API) $('#au').value=API; }
+</script></body></html>
