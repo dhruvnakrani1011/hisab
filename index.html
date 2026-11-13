@@ -19,7 +19,7 @@ button{font:inherit;cursor:pointer;color:var(--ink)}.btn{border:1px solid var(--
 .pri{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:0;padding:10px 22px;border-radius:10px;font-weight:600;box-shadow:0 6px 16px rgba(79,70,229,.3)}
 main{margin-left:208px;padding:24px 22px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:var(--sh)}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:16px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--sh);position:relative}
 .stat small{color:var(--mut);font-weight:600}.stat b{display:block;font-size:24px;margin-top:4px;letter-spacing:-.5px}
 .si{position:absolute;right:14px;top:14px;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-weight:800;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
@@ -53,6 +53,7 @@ th{z-index:4}
 .newp{display:block;margin-top:6px;font-size:12px;color:#b45309;background:var(--ext);border-radius:8px;padding:6px 10px}
 @media(max-width:900px){.ent-grid{grid-template-columns:1fr}.card.wrap{max-height:none}}
 .bt{min-width:780px}.bt td{padding:4px 5px;border-bottom:0;vertical-align:middle}.bt th{position:static}.bt input,.bt select{padding:8px;border-radius:8px}
+.bt input.newin{border-color:#f59e0b;background:var(--ext)}
 .bt tr.err input,.bt tr.err select{border-color:var(--red);background:var(--ext)}.bt .tot{font-weight:700;text-align:right;white-space:nowrap;min-width:110px}
 .pills{display:flex;gap:6px;flex-wrap:wrap}.pill{border:1px solid var(--line);background:var(--card);padding:8px 15px;border-radius:999px;font-weight:600;font-size:13px;color:var(--mut);white-space:nowrap}
 .pill:hover{border-color:var(--pri)}.pill.on{background:var(--pri);color:#fff;border-color:var(--pri)}
@@ -74,6 +75,7 @@ tr{break-inside:avoid}thead{display:table-header-group}.kpi b{font-size:15px}#st
 .cb{display:flex;align-items:flex-end;gap:3px;flex:1;border-bottom:1px solid var(--line)}.cb i{flex:1;border-radius:5px 5px 0 0;min-height:2px}
 .cg small{text-align:center;color:var(--mut);font-size:11px;margin-top:4px;white-space:nowrap}.cg em{text-align:center;font-style:normal;font-size:10px;color:var(--mut)}
 .lg{display:flex;gap:16px;font-size:12px;color:var(--mut);margin:8px 0 0}.lg s{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;text-decoration:none;vertical-align:middle}
+.th{width:34px;height:34px;object-fit:cover;border-radius:8px;vertical-align:middle;margin-right:8px;background:var(--priL);flex:none}.th0{display:inline-grid;place-items:center;color:var(--mut);font-size:11px;cursor:pointer}.pn2{display:flex;align-items:center}
 .sh{height:6px;border-radius:4px;background:var(--priL);min-width:60px}.sh i{display:block;height:100%;border-radius:4px;background:var(--pri)}
 .at{min-width:0}.up{color:var(--ok)}.dn{color:var(--red)}h3{margin:0 0 12px;font-size:15px}
 </style></head><body>
@@ -87,13 +89,14 @@ tr{break-inside:avoid}thead{display:table-header-group}.kpi b{font-size:15px}#st
 <section id="app" class="hide">
 <header><span class="logo">Party Hisab</span>
 <nav><button data-t="sum">&#9638;&nbsp; Summary</button><button data-t="led">&#9776;&nbsp; Ledger</button><button data-t="ent">&#65291;&nbsp; New Entry</button><button data-t="blk">&#9638;&nbsp; Bulk Entry</button><button data-t="lst">&#9776;&nbsp; Entry List</button><button data-t="ana">&#9650;&nbsp; Analytics</button></nav>
-<span id="who">Owner</span><span id="sync" style="font-size:12px;color:#94a3b8;padding:0 8px"></span><button class="btn" onclick="backup()">Backup</button><button class="btn" onclick="rebuildAllUi()">Rebuild Sheet</button><button class="btn" onclick="logout()">Sign out</button></header>
+<span id="who">Owner</span><span id="sync" style="font-size:12px;color:#94a3b8;padding:0 8px"></span><button class="btn" onclick="$('#imd').showModal()">Product Images</button><button class="btn" onclick="backup()">Backup</button><button class="btn" onclick="rebuildAllUi()">Rebuild Sheet</button><button class="btn" onclick="logout()">Sign out</button></header>
 <main><div id="msg"></div>
 
 <div id="sum" class="tab hide">
-<div class="stats"><div class="stat"><span class="si" style="--c:#e11d48">&#8377;</span><small>Total Pending</small><b id="s1">-</b></div>
+<div class="stats"><div class="stat"><span class="si" style="--c:#e11d48">&#8377;</span><small>Total Payable (Pending)</small><b id="s1">-</b></div>
 <div class="stat"><span class="si" style="--c:#4f46e5">&#8593;</span><small>Total Purchase</small><b id="s2">-</b></div>
-<div class="stat"><span class="si" style="--c:#16a34a">&#8595;</span><small>Payment Received</small><b id="s3">-</b></div>
+<div class="stat"><span class="si" style="--c:#16a34a">&#8595;</span><small>Cash Paid</small><b id="s3">-</b></div>
+<div class="stat"><span class="si" style="--c:#0ea5e9">&#8595;</span><small>Bank Paid</small><b id="s5">-</b></div>
 <div class="stat"><span class="si" style="--c:#f59e0b">&#9679;</span><small>Parties</small><b id="s4">-</b></div></div>
 <div class="card bar noprint"><div><label>Search party</label><input id="sq" placeholder="Type party name..." oninput="drawSummary()"></div>
 <label class="chk"><input type="checkbox" id="sp" onchange="drawSummary()"> Pending only</label></div>
@@ -117,8 +120,9 @@ tr{break-inside:avoid}thead{display:table-header-group}.kpi b{font-size:15px}#st
 <div id="g_ct" class="hide"><label>Charge type</label><select id="f_ct"><option>Transport Charges</option><option>Other Charges</option></select></div>
 <div id="g_rem" class="hide"><label>Remark</label><input id="f_rem"></div>
 <p style="margin-bottom:0"><button class="pri" style="width:100%;padding:13px" onclick="saveEntry()">Save Entry</button></p></div>
-<div class="card sidep"><small>Entry Total</small><b id="pvT">&#8377; 0.00</b><i id="pvF"></i><hr><small>Current Pending</small><b id="pcur">-</b><small>After this entry</small><b id="pnew">-</b></div>
+<div class="card sidep"><div id="pimg"></div><small>Entry Total</small><b id="pvT">&#8377; 0.00</b><i id="pvF"></i><hr><small>Current Pending</small><b id="pcur">-</b><small>After this entry</small><b id="pnew">-</b></div>
 </div></div>
+<dialog id="imd"><b style="font-size:16px">Product images</b><p style="color:var(--mut);font-size:12px">Paste one product per line: PRODUCT NAME, then the image link (copy from Excel or write NAME [space] https://...). Existing images are replaced.</p><textarea id="im_t" rows="9" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:12px monospace"></textarea><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#imd').close()">Cancel</button> <button class="pri" onclick="importImgs()">Save images</button></p></dialog>
 <dialog id="npd"><b style="font-size:16px">New party</b><label>Party name</label><input id="np_n"><label>Opening balance</label><input id="np_o" type="number" step="any" placeholder="0"><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#npd').close()">Cancel</button> <button class="pri" onclick="saveParty()">Add party</button></p></dialog>
 <dialog id="dlg"><b id="dt" style="font-size:16px">Edit entry</b><div id="df"></div><div id="dw" class="warn hide">This entry is marked Matched. Editing will clear the mark.</div><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#dlg').close()">Cancel</button> <button class="pri" onclick="saveEdit()">Save</button></p></dialog>
 <div id="blk" class="tab hide"><div class="card noprint">
@@ -147,7 +151,7 @@ tr{break-inside:avoid}thead{display:table-header-group}.kpi b{font-size:15px}#st
 <div><div class="flab">Rank by</div><select id="a_sort" onchange="drawAna()"><option value="val">Value</option><option value="ctn">Cartons</option><option value="pcs">Pieces</option><option value="ord">Orders</option></select></div>
 <label class="chk"><input type="checkbox" id="a_cmp" onchange="drawAna()"> Compare with previous period</label><button class="btn" onclick="window.print()">Print</button></div></div>
 <div class="card kpi" id="a_kpi"></div>
-<div class="card"><h3>Monthly trend</h3><div class="cht" id="a_ch"></div><div class="lg"><span><s style="background:var(--pri)"></s>Purchase</span><span><s style="background:var(--ok)"></s>Payments received</span></div></div>
+<div class="card"><h3>Monthly trend</h3><div class="cht" id="a_ch"></div><div class="lg"><span><s style="background:var(--pri)"></s>Purchase</span><span><s style="background:var(--ok)"></s>Payments made</span></div></div>
 <div class="card at"><h3>Products</h3><div class="wrap"><table class="at"><thead><tr><th>Product</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Pieces</th><th class="n">Value</th><th class="n">Avg price / pc</th><th>Share</th></tr></thead><tbody id="a_pt"></tbody></table></div></div>
 <div class="card at"><h3>Parties</h3><div class="wrap"><table class="at"><thead><tr><th>Party</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Purchase</th><th class="n">Avg order</th><th class="n">Payments</th><th>Share</th></tr></thead><tbody id="a_ptb"></tbody></table></div></div>
 </div>
@@ -196,6 +200,8 @@ function ledgerRows(D,mult,name,opening){
 }
 //CALC-END
 const DEFAULT_URL=""; // optional: ahi Web App URL paste karo to kyarey puchse nahi
+let imgs={}; const IU=n=>imgs[String(n).trim().toUpperCase()]||'';
+const thumb=(n,edit)=>{ const u=IU(n); return u?`<img class="th" loading="lazy" src="${esc(u)}" alt="" onerror="this.style.display='none'">`:(edit?`<span class="th th0" title="Add image" data-n="${esc(n)}" onclick="setImg(this.dataset.n)">+</span>`:''); };
 let API=localStorage.getItem('gs_url')||DEFAULT_URL, KEY=localStorage.getItem('gs_key')||'';
 let D={parties:[],products:[],mail:[],pay:[],ext:[],mult:4}, parties=[], mult=4, ed=null, prodSet=new Set();
 const SHEET={MAIL:'Mail',PAYMENT:'Payments',EXTRA:'Extra'}, LIST={MAIL:'mail',PAYMENT:'pay',EXTRA:'ext'};
@@ -224,12 +230,12 @@ async function start(){
   $('#plist').innerHTML=D.products.map(p=>`<option value="${esc(p.name)}">`).join('');
   $('#f_date').valueAsDate=new Date(); kindUI(); tab('sum'); drawSummary();
 }
-function refresh(){ parties=calc(D,mult); $('#plist2').innerHTML=parties.map(p=>`<option value="${esc(p.party_name)}">`).join(''); }
+function refresh(){ imgs={}; D.products.forEach(p=>{ if(p.image) imgs[String(p.name).trim().toUpperCase()]=p.image; }); parties=calc(D,mult); $('#plist2').innerHTML=parties.map(p=>`<option value="${esc(p.party_name)}">`).join(''); }
 
 function drawSummary(){
   const S=k=>parties.reduce((a,p)=>a+Number(p[k]||0),0);
   $('#s1').textContent='\u20B9 '+fmt(S('final_pending')); $('#s2').textContent='\u20B9 '+fmt(S('main_purchase')+S('extra_charges'));
-  $('#s3').textContent='\u20B9 '+fmt(S('cash_payment')+S('bank_payment')); $('#s4').textContent=parties.length;
+  $('#s3').textContent='\u20B9 '+fmt(S('cash_payment')); $('#s5').textContent='\u20B9 '+fmt(S('bank_payment')); $('#s4').textContent=parties.length;
   const q=$('#sq').value.trim().toLowerCase(), onlyP=$('#sp').checked;
   const L=parties.filter(p=>p.party_name.toLowerCase().includes(q)&&(!onlyP||Math.abs(p.final_pending)>0.005));
   const T=k=>L.reduce((a,p)=>a+Number(p[k]||0),0);
@@ -251,7 +257,7 @@ function loadLedger(){
   $('#lb').innerHTML=rows.map(r=>{
     const act=`<button class="ic ${r.m?'ok':''}" title="Match mark" onclick="mark('${r.kind}','${r.id}',${!!r.m})">✓</button><button class="ic" title="Edit entry" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic" title="Note" data-n="${esc(r.note)}" onclick="editNote('${r.kind}','${r.id}',this)">💬</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button>`;
     return `<tr class="${r.kind} ${r.m?'m':''}"><td>${fd(r.date)}</td><td>${esc(name)}</td>
-    <td>${r.kind==='PAYMENT'?'<span class="ch p">Payment</span>':r.kind==='EXTRA'?'<span class="ch e">Extra</span>':''}${esc(r.remark)}${r.m?`<span class="tag">✓ Matched ${fd(r.m)}</span>`:''}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
+    <td>${r.kind==='PAYMENT'?'<span class="ch p">Payment</span>':r.kind==='EXTRA'?'<span class="ch e">Extra</span>':thumb(r.remark)}${esc(r.remark)}${r.m?`<span class="tag">✓ Matched ${fd(r.m)}</span>`:''}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
     <td class="n">${r.cartons}</td><td class="n">${r.pcs}</td><td class="n">${fmt(r.price)}</td><td class="n">${fmt(r.total)}</td>
     <td class="n">${fmt(r.mode==='CASH'?r.payment:0)}</td><td class="n">${fmt(r.mode==='BANK'?r.payment:0)}</td>
     <td class="n"><b>${fmt(r.pending)}</b></td><td class="noprint n">${act}</td></tr>`}).join('');
@@ -306,7 +312,7 @@ function prev(){
   $('#pvT').textContent='\u20B9 '+fmt(amt);
   $('#pvF').textContent=k==='mail'?'Cartons \u00D7 Pcs \u00D7 Price \u00D7 '+mult:k==='pay'?'Payment: reduces pending':'Extra charge: increases pending';
   $('#pcur').textContent=cur===null?'-':'\u20B9 '+fmt(cur); $('#pnew').textContent=cur===null?'-':'\u20B9 '+fmt(k==='pay'?cur-amt:cur+amt);
-  const pn=$('#f_prod').value.trim(); $('#np').classList.toggle('hide',!(k==='mail'&&pn&&!prodSet.has(pn.toUpperCase())));
+  const pn=$('#f_prod').value.trim(); $('#pimg').innerHTML=k==='mail'&&IU(pn)?`<img src="${esc(IU(pn))}" alt="" style="width:100%;max-height:180px;object-fit:contain;border-radius:12px;margin-bottom:10px;background:var(--priL)" onerror="this.style.display='none'">`:''; $('#np').classList.toggle('hide',!(k==='mail'&&pn&&!prodSet.has(pn.toUpperCase())));
 }
 function newParty(){ $('#np_n').value=$('#f_party').value.trim(); $('#np_o').value=''; $('#npd').showModal(); }
 async function saveParty(){
@@ -365,6 +371,7 @@ function allEntries(){
   D.pay.filter(live).forEach(r=>o.push({kind:'PAYMENT',id:r.id,date:r.date,party:r.party,remark:r.remark,qty:'',price:0,amt:num(r.amount),mode:String(r.mode).toUpperCase(),c:r.created_at||'',seq:r._r,note:r.note}));
   return o;
 }
+let listLim=1000,lastSig='';
 function drawList(){
   syncPills();
   const by=$('#lf_by').value, f=$('#lf_from').value, t=$('#lf_to').value, pn=$('#lf_party').value.trim().toLowerCase(), k=$('#lf_kind').value;
@@ -372,13 +379,14 @@ function drawList(){
     return (!f||d>=f)&&(!t||d<=t)&&(!k||r.kind===k)&&(!pn||r.party.toLowerCase().includes(pn)); });
   L.sort((a,b)=>by==='created'?((b.c>a.c?1:b.c<a.c?-1:0)||(b.date>a.date?1:b.date<a.date?-1:0)||b.seq-a.seq):((b.date>a.date?1:b.date<a.date?-1:0)||(b.c>a.c?1:b.c<a.c?-1:0)||b.seq-a.seq));
   $('#lk1').textContent=L.length; $('#lk2').textContent='\u20B9 '+fmt(L.filter(r=>r.kind!=='PAYMENT').reduce((a,r)=>a+r.amt,0)); $('#lk3').textContent='\u20B9 '+fmt(L.filter(r=>r.kind==='PAYMENT').reduce((a,r)=>a+r.amt,0));
-  const shown=L.slice(0,500);
+  const sig=[by,f,t,pn,k].join('|'); if(sig!==lastSig){ lastSig=sig; listLim=1000; } const shown=L.slice(0,listLim);
   $('#ll').innerHTML=shown.map(r=>`<tr class="${r.kind}"><td>${fd(r.date)}</td><td><b>${esc(r.party)}</b></td>
-   <td>${r.kind==='PAYMENT'?`<span class="ch p">${esc(r.mode||'Payment')}</span>`:r.kind==='EXTRA'?'<span class="ch e">Extra</span>':''}${esc(r.remark)}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
+   <td>${r.kind==='PAYMENT'?`<span class="ch p">${esc(r.mode||'Payment')}</span>`:r.kind==='EXTRA'?'<span class="ch e">Extra</span>':thumb(r.remark)}${esc(r.remark)}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
    <td class="n">${esc(r.qty)}</td><td class="n">${r.price?fmt(r.price):''}</td><td class="n"><b>${fmt(r.amt)}</b></td>
    <td>${r.c?fd(r.c)+' '+r.c.slice(11,16):'-'}</td>
    <td class="noprint n"><button class="ic" title="Edit" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button></td></tr>`).join('')||'<tr><td colspan="8" style="padding:20px;color:var(--mut)">No entries found. For older entries click <b>"All (incl. old)"</b> above.</td></tr>';
-  say(L.length>500?'Showing the first 500 entries. Narrow with date or party filters.':'');
+  if(L.length>shown.length) $('#ll').insertAdjacentHTML('beforeend',`<tr><td colspan="8" style="text-align:center;padding:14px"><button class="btn" onclick="listLim+=1000;drawList()">Show more (${L.length-shown.length} remaining)</button></td></tr>`);
+  say(L.length>shown.length?'Showing '+shown.length+' of '+L.length+' entries.':'');
 }
 
 // ---------- Bulk Entry ----------
@@ -401,10 +409,10 @@ function bAdd(n){
 function bRows(){ return [...$('#bb').children].map(tr=>{ const o={}; tr.querySelectorAll('.b-in').forEach(i=>o[i.dataset.c]=i.value.trim()); return {tr,o}; }); }
 const bFilled=o=>Object.entries(o).some(([k,v])=>v&&k!=='party'&&k!=='mode');
 function bCalc(){
-  let n=0,s=0;
-  bRows().forEach(({tr,o},i)=>{ tr.firstElementChild.textContent=i+1; const f=bFilled(o); if(f) n++;
+  let n=0,s=0,np=new Set();
+  bRows().forEach(({tr,o},i)=>{ tr.firstElementChild.textContent=i+1; const f=bFilled(o); if(f) n++; const pi=tr.querySelector('[data-c=party]'), isNew=!!(o.party&&!pname(o.party)); pi.classList.toggle('newin',isNew); pi.title=isNew?'New party - will be added to Party Master':''; if(isNew) np.add(o.party.toLowerCase());
     if(bk==='mail'){ const t=(+o.c||0)*(+o.p||0)*(+o.pr||0)*mult; tr.querySelector('.tot').textContent=t?fmt(t):''; if(f) s+=t; } else if(f) s+=(+o.cash||0)+(+o.bank||0); });
-  $('#bsum').textContent=n+' entries · '+(bk==='mail'?'Total':'Payments')+' \u20B9 '+fmt(s);
+  $('#bsum').textContent=n+' entries'+(np.size?' · '+np.size+' new part'+(np.size>1?'ies':'y')+' (amber)':'')+' · '+(bk==='mail'?'Total':'Payments')+' \u20B9 '+fmt(s);
 }
 function bPaste(txt,t){
   const cols=BC[bk].map(c=>c[0]); const ri=[...$('#bb').children].indexOf(t.closest('tr')), ci=cols.indexOf(t.dataset.c);
@@ -475,15 +483,24 @@ function drawAna(){
   const K=(l,v,x)=>`<div><small>${l}</small><b>${v}</b>${x||''}</div>`;
   $('#a_kpi').innerHTML=K('Purchase value','₹ '+fmt(A.val),dl(A.val,B&&B.val))+K('Orders',A.ord,dl(A.ord,B&&B.ord))+K('Cartons',fmt(A.ctn).replace('.00',''),dl(A.ctn,B&&B.ctn))+K('Pieces',Math.round(A.pcs).toLocaleString('en-IN'),dl(A.pcs,B&&B.pcs))
    +K('Avg order value','₹ '+fmt(A.ord?A.val/A.ord:0))+K('Avg price / piece','₹ '+fmt(A.pcs?A.val/A.pcs:0))+K('Avg per active day','₹ '+fmt(nd?A.val/nd:0),'<i>'+nd+' active days</i>')
-   +(pr?'':K('Payments received','₹ '+fmt(pay),dl(pay,B&&(B.cash+B.bank))+'<i>Cash '+fmt(A.cash)+' ('+(pay?Math.round(A.cash/pay*100):0)+'%) · Bank '+fmt(A.bank)+'</i>'));
+   +(pr?'':K('Payments made','₹ '+fmt(pay),dl(pay,B&&(B.cash+B.bank))+'<i>Cash '+fmt(A.cash)+' ('+(pay?Math.round(A.cash/pay*100):0)+'%) · Bank '+fmt(A.bank)+'</i>'));
   const ms=Object.keys(A.month).sort().slice(-24), mx=Math.max(1,...ms.map(m=>Math.max(A.month[m].p,A.month[m].r)));
   $('#a_ch').innerHTML=ms.map(m=>{ const o=A.month[m]; return `<div class="cg" title="${MN[+m.slice(5)-1]} ${m.slice(0,4)}: Purchase ${fmt(o.p)} | Payments ${fmt(o.r)}"><em>${cmp(o.p)}</em><div class="cb"><i style="height:${o.p/mx*100}%;background:var(--pri)"></i><i style="height:${o.r/mx*100}%;background:var(--ok)"></i></div><small>${MN[+m.slice(5)-1]} '${m.slice(2,4)}</small></div>`; }).join('')||'<div style="color:var(--mut)">No data for this filter.</div>';
   const top=(o)=>Object.values(o).sort((a,b)=>b[sk]-a[sk]).slice(0,100);
   const sh=(x,tot)=>`<td><div class="sh"><i style="width:${tot?x/tot*100:0}%"></i></div><small style="color:var(--mut)">${tot?(x/tot*100).toFixed(1):0}%</small></td>`;
-  $('#a_pt').innerHTML=top(A.prod).map(p=>`<tr><td><b>${esc(p.n)}</b></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n">${p.pcs.toLocaleString('en-IN')}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.pcs?p.val/p.pcs:0)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
+  $('#a_pt').innerHTML=top(A.prod).map(p=>`<tr><td><div class="pn2">${thumb(p.n,1)}<b>${esc(p.n)}</b></div></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n">${p.pcs.toLocaleString('en-IN')}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.pcs?p.val/p.pcs:0)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
   $('#a_ptb').innerHTML=top(A.party).map(p=>`<tr><td><b>${esc(p.n)}</b></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.ord?p.val/p.ord:0)}</td><td class="n">${fmt(p.pay)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
   say(pr?'Payments are not shown when a product filter is set.':($('#a_cmp').checked&&!(f&&t)?'Select both From and To dates to compare with the previous period.':''));
 }
+async function saveImgs(items){
+  const n=await call('setImages',{items}); items.forEach(x=>{ const p=D.products.find(q=>String(q.name).trim().toUpperCase()===x.name.toUpperCase()); if(p) p.image=x.image; }); refresh(); return n; }
+async function setImg(name){ const u=prompt('Image link for '+name+':'); if(!u||!/^https?:\/\//.test(u.trim())) return;
+  try{ await saveImgs([{name,image:u.trim()}]); drawAna(); say('\u2713 Image saved'); }catch(e){ say(e.message,true); } }
+async function importImgs(){
+  const items=$('#im_t').value.split('\n').map(l=>{ const m=l.match(/https?:\/\/\S+/); if(!m) return null; const name=l.slice(0,m.index).replace(/[\t,;|]+\s*$/,'').replace(/\s+$/,'').trim(); return name?{name,image:m[0].trim()}:null; }).filter(Boolean);
+  if(!items.length) return alert('No valid lines found (NAME then https link)');
+  say('Saving '+items.length+' images...'); $('#imd').close();
+  try{ let n=0; for(let i=0;i<items.length;i+=300) n+=await saveImgs(items.slice(i,i+300)); say('\u2713 '+n+' of '+items.length+' images matched to Product Master'); redraw(); }catch(e){ say(e.message,true); } }
 async function backup(){ say('Creating backup...'); try{ const n=await call('backup'); say('✓ Backup created: '+n+' (in Google Drive)'); }catch(e){ say(e.message,true); } }
 
 if(DEFAULT_URL) $('#urlrow').classList.add('hide');
