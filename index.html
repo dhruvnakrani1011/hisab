@@ -168,7 +168,7 @@ function ledgerRows(D,mult,name,opening){
   let p=opening; o.forEach(r=>{p+=r.total-r.payment; r.pending=p;}); return o;
 }
 //CALC-END
-const DEFAULT_URL="https://script.google.com/macros/s/AKfycbyvNFXs5Esq3_UmzXBn_pseBhZPms27jwZrAUqAXKYjdnQATTU8dLxftLprpVr6CgYVSg/exec"; // optional: ahi Web App URL paste karo to kyarey puchse nahi
+const DEFAULT_URL="https://script.google.com/macros/s/AKfycbx2lOqTAQT3VhNCgxSfzhHiT-q5Im7j6UXqpfkWQ_cWk3WpLFRD4vGO4cYNGW6FBj0OQw/exec"; // optional: ahi Web App URL paste karo to kyarey puchse nahi
 let API=localStorage.getItem('gs_url')||DEFAULT_URL, KEY=localStorage.getItem('gs_key')||'';
 let D={parties:[],products:[],mail:[],pay:[],ext:[],mult:4}, parties=[], mult=4, ed=null, prodSet=new Set();
 const SHEET={MAIL:'Mail',PAYMENT:'Payments',EXTRA:'Extra'}, LIST={MAIL:'mail',PAYMENT:'pay',EXTRA:'ext'};
