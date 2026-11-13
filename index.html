@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="gu"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Party Hisab</title>
 <style>
 :root{--bg:#f4f6fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e8ecf3;--pri:#4f46e5;--priL:#eef0ff;--mail:#f3f7ff;--pay:#effaf3;--ext:#fff8e6;--ok:#16a34a;--red:#e11d48;--side:#0f172a;--sh:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06)}
-@media(prefers-color-scheme:dark){:root{--bg:#0b1020;--card:#131a2b;--ink:#e8ecf6;--mut:#94a3b8;--line:#222c42;--pri:#818cf8;--priL:#232b52;--mail:#16233d;--pay:#12281d;--ext:#2f2a14;--ok:#4ade80;--red:#fb7185;--side:#0a0f1d}}
+@media(prefers-color-scheme:dark){:root{--bg:#0b1020;--card:#131a2b;--ink:#e8ecf6;--mut:#94a3b8;--line:#222c42;--pri:#818cf8;--priL:#232b52;--mail:#16233d;--pay:#12281d;--ext:#2f2a14;--ok:#4ade80;--red:#fb7185;--side:#0a0f1d;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
 header{position:fixed;inset:0 auto 0 0;width:208px;z-index:5;display:flex;flex-direction:column;gap:6px;padding:22px 14px;background:var(--side);color:#cbd5e1}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:#fff;padding:0 8px 20px}
@@ -25,6 +25,8 @@ main{margin-left:208px;padding:24px 22px}
 .si{position:absolute;right:14px;top:14px;width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-weight:800;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
 label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin:10px 0 5px}
 input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit}
+select{appearance:none;-webkit-appearance:none;padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 input:focus,select:focus{outline:3px solid var(--priL);border-color:var(--pri)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0 14px}
 .bar{display:flex;gap:12px;flex-wrap:wrap;align-items:end}.bar>div{flex:1;min-width:200px}.bar label{margin-top:0}
@@ -35,14 +37,14 @@ td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 .n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 tr.MAIL td{background:var(--mail)}tr.PAYMENT td{background:var(--pay)}tr.EXTRA td{background:var(--ext)}
 tr.m td:first-child{box-shadow:inset 4px 0 0 var(--ok)}tr.s td{background:var(--card);font-weight:700}
-.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}.kpi small{color:var(--mut);font-weight:600}.kpi b{display:block;font-size:22px;margin-top:3px;letter-spacing:-.4px}.kpi i{font-size:12px;color:var(--mut);font-style:normal}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}.kpi small{color:var(--mut);font-weight:600}.kpi b{display:block;font-size:22px;margin-top:3px;letter-spacing:-.4px}.kpi i{display:block;font-size:12px;color:var(--mut);font-style:normal}
 .neg{color:var(--red)}.hide{display:none!important}
 .av{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--priL);color:var(--pri);font-weight:700;font-size:12px;margin-right:9px;vertical-align:middle}
 .ch{display:inline-block;font-size:10px;font-weight:700;border-radius:6px;padding:1px 6px;margin-right:6px;text-transform:uppercase;letter-spacing:.4px}.ch.p{background:var(--ok);color:#fff}.ch.e{background:#f59e0b;color:#fff}
 .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--ok);background:var(--card);border:1px solid var(--ok);border-radius:10px;padding:0 8px;margin-left:6px}
 .note{display:block;font-size:12px;color:var(--mut);font-style:italic}
 .ic{border:1px solid var(--line);background:var(--card);border-radius:8px;width:27px;height:27px;margin-left:2px;line-height:1}.ic:hover{border-color:var(--pri)}.ic.ok{background:var(--ok);color:#fff;border-color:var(--ok)}.ic.del{color:var(--red)}
-@media screen{#led thead th:nth-child(2),#lb td:nth-child(2){display:none}}#lb td:nth-child(3){min-width:180px}#led td,#led th{padding:9px 8px}.card.wrap{padding:0;overflow:auto;max-height:calc(100vh - 330px);min-height:300px}
+#led thead th:nth-child(2),#lb td:nth-child(2){display:none}#lb td:nth-child(3){min-width:180px}#led td,#led th{padding:9px 8px}.card.wrap{padding:0;overflow:auto;max-height:calc(100vh - 330px);min-height:300px}
 #stot td{position:sticky;top:calc(var(--h,38px) - 1px);z-index:3;background:var(--card);font-weight:700;border-bottom:2px solid var(--line)}
 th{z-index:4}
 .ent-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start;max-width:1000px}
@@ -62,7 +64,18 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);co
 #login{min-height:100vh;display:grid;place-items:center;background:radial-gradient(900px 500px at 15% 0,#c7d2fe 0,transparent 60%),radial-gradient(800px 500px at 100% 100%,#ddd6fe 0,transparent 60%),var(--bg)}
 #login main{margin:0;padding:16px;width:min(400px,100%)}#login .logo{color:var(--ink);padding:0 0 14px}
 @media(max-width:900px){header{position:sticky;inset:auto;top:0;width:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:10px 12px}.logo{padding:0}nav{flex-direction:row;overflow:auto;flex:1 1 100%;order:3}main{margin-left:0;padding:14px}}
-@media print{header,.noprint,#msg,.stats{display:none!important}body{background:#fff;color:#000}main{margin:0;padding:0}.card{box-shadow:none;border:0;padding:0}.wrap{max-height:none;overflow:visible}td,th{font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media print{@page{size:A4 landscape;margin:8mm}
+:root{--bg:#fff;--card:#fff;--ink:#000;--mut:#444;--line:#cbd5e1;--mail:#f3f7ff;--pay:#effaf3;--ext:#fff8e6;--priL:#eef0ff;--pri:#3730a3;--ok:#15803d;--red:#be123c}
+header,.noprint,#msg,.stats,.act{display:none!important}body{background:#fff;color:#000}main{margin:0!important;padding:0!important}
+.card{box-shadow:none;border:0;padding:0 0 8px;margin-bottom:8px;break-inside:avoid}.wrap,.card.wrap{max-height:none!important;overflow:visible!important;min-height:0!important}
+table{min-width:0!important;width:100%!important;table-layout:auto}th,td{position:static!important;padding:4px 6px!important;font-size:10px!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+tr{break-inside:avoid}thead{display:table-header-group}.kpi b{font-size:15px}#stot td{position:static!important}}
+.cht{display:flex;align-items:stretch;gap:12px;height:210px;overflow-x:auto;padding:6px 2px 0}.cg{display:flex;flex-direction:column;min-width:54px;flex:1;max-width:90px}
+.cb{display:flex;align-items:flex-end;gap:3px;flex:1;border-bottom:1px solid var(--line)}.cb i{flex:1;border-radius:5px 5px 0 0;min-height:2px}
+.cg small{text-align:center;color:var(--mut);font-size:11px;margin-top:4px;white-space:nowrap}.cg em{text-align:center;font-style:normal;font-size:10px;color:var(--mut)}
+.lg{display:flex;gap:16px;font-size:12px;color:var(--mut);margin:8px 0 0}.lg s{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;text-decoration:none;vertical-align:middle}
+.sh{height:6px;border-radius:4px;background:var(--priL);min-width:60px}.sh i{display:block;height:100%;border-radius:4px;background:var(--pri)}
+.at{min-width:0}.up{color:var(--ok)}.dn{color:var(--red)}h3{margin:0 0 12px;font-size:15px}
 </style></head><body>
 
 <section id="login" class="hide"><main><div class="card">
@@ -73,8 +86,8 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);co
 
 <section id="app" class="hide">
 <header><span class="logo">Party Hisab</span>
-<nav><button data-t="sum">&#9638;&nbsp; Summary</button><button data-t="led">&#9776;&nbsp; Ledger</button><button data-t="ent">&#65291;&nbsp; New Entry</button><button data-t="blk">&#9638;&nbsp; Bulk Entry</button><button data-t="lst">&#9776;&nbsp; Entry List</button></nav>
-<span id="who">Owner</span><span id="sync" style="font-size:12px;color:#94a3b8;padding:0 8px"></span><button class="btn" onclick="backup()">Backup</button><button class="btn" onclick="rebuildAllUi()">Sheet refresh</button><button class="btn" onclick="logout()">Lock</button></header>
+<nav><button data-t="sum">&#9638;&nbsp; Summary</button><button data-t="led">&#9776;&nbsp; Ledger</button><button data-t="ent">&#65291;&nbsp; New Entry</button><button data-t="blk">&#9638;&nbsp; Bulk Entry</button><button data-t="lst">&#9776;&nbsp; Entry List</button><button data-t="ana">&#9650;&nbsp; Analytics</button></nav>
+<span id="who">Owner</span><span id="sync" style="font-size:12px;color:#94a3b8;padding:0 8px"></span><button class="btn" onclick="backup()">Backup</button><button class="btn" onclick="rebuildAllUi()">Rebuild Sheet</button><button class="btn" onclick="logout()">Sign out</button></header>
 <main><div id="msg"></div>
 
 <div id="sum" class="tab hide">
@@ -82,48 +95,62 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);co
 <div class="stat"><span class="si" style="--c:#4f46e5">&#8593;</span><small>Total Purchase</small><b id="s2">-</b></div>
 <div class="stat"><span class="si" style="--c:#16a34a">&#8595;</span><small>Payment Received</small><b id="s3">-</b></div>
 <div class="stat"><span class="si" style="--c:#f59e0b">&#9679;</span><small>Parties</small><b id="s4">-</b></div></div>
-<div class="card bar noprint"><div><label>Party shodho</label><input id="sq" placeholder="naam lakho..." oninput="drawSummary()"></div>
-<label class="chk"><input type="checkbox" id="sp" onchange="drawSummary()"> Pending vala j</label></div>
+<div class="card bar noprint"><div><label>Search party</label><input id="sq" placeholder="Type party name..." oninput="drawSummary()"></div>
+<label class="chk"><input type="checkbox" id="sp" onchange="drawSummary()"> Pending only</label></div>
 <div class="card wrap"><table><thead><tr><th>Party</th><th class="n">Opening</th><th class="n">Purchase</th><th class="n">Extra</th><th class="n">Cash</th><th class="n">Bank</th><th class="n">Final Pending</th></tr><tr class="s" id="stot"></tr></thead><tbody id="sb"></tbody></table></div></div>
 
 <div id="led" class="tab hide">
-<div class="card bar noprint"><div><label>Party</label><input id="lp" list="plist2" placeholder="party nu naam lakho / select karo" onchange="loadLedger()"></div>
+<div class="card bar noprint"><div><label>Party</label><input id="lp" list="plist2" placeholder="Type or select party" onchange="loadLedger()"></div>
 <button class="btn" onclick="window.print()">Print / PDF</button></div>
 <div class="card kpi"><div><small>Party</small><b id="k0">-</b></div><div><small>Opening Balance</small><b id="k1">-</b></div>
 <div><small>Final Pending</small><b id="k2">-</b></div><div><small>Last Matched</small><b id="k3">-</b><i id="k4"></i></div></div>
-<div class="card wrap"><table><thead><tr><th>Date</th><th>Party Name</th><th>Product Name</th><th class="n">Cartoon</th><th class="n">Cartoon Pcs</th><th class="n">Original Price</th><th class="n">Original Total</th><th class="n">Cash Payment</th><th class="n">Bank Payment</th><th class="n">Pending</th><th class="noprint act"></th></tr></thead><tbody id="lb"></tbody></table></div></div>
+<div class="card wrap"><table><thead><tr><th>Date</th><th>Party Name</th><th>Product Name</th><th class="n">Cartons</th><th class="n">Pcs / Carton</th><th class="n">Original Price</th><th class="n">Original Total</th><th class="n">Cash Payment</th><th class="n">Bank Payment</th><th class="n">Pending</th><th class="noprint act"></th></tr></thead><tbody id="lb"></tbody></table></div></div>
 
 <div id="ent" class="tab hide"><div class="ent-grid noprint">
 <div class="card"><div class="seg" id="seg"><button data-k="mail" class="on">Mail Entry</button><button data-k="pay">Payment</button><button data-k="ext">Extra Charge</button></div><input type="hidden" id="kind" value="mail">
-<div class="grid"><div><label>Date</label><input id="f_date" type="date"></div><div><label>Party</label><input id="f_party" list="plist2" placeholder="party select karo" oninput="prev()"></div></div>
-<div id="g_mail"><label>Product</label><input id="f_prod" list="plist" autocomplete="off" placeholder="product shodho ke navu lakho" oninput="prev()">
-<span id="np" class="newp hide">+ Navu product che. Save karta j product list ma add thai jase.</span>
-<div class="grid"><div><label>Cartoon</label><input id="f_c" type="number" step="any" oninput="prev()"></div><div><label>Cartoon Pcs</label><input id="f_p" type="number" step="any" oninput="prev()"></div><div><label>Price (mail price)</label><input id="f_pr" type="number" step="any" oninput="prev()"></div></div></div>
-<div id="g_pay" class="hide"><div class="grid"><div><label>Amount</label><input id="f_amt" type="number" step="any" oninput="prev()"></div><div><label>Mode</label><select id="f_mode"><option>CASH</option><option>BANK</option></select></div></div></div>
-<div id="g_ext" class="hide"><label>Charge type</label><select id="f_ct"><option>Transport Charges</option><option>Other Charges</option></select></div>
+<div class="grid"><div><label>Date</label><input id="f_date" type="date"></div><div><label>Party</label><div style="display:flex;gap:8px"><input id="f_party" list="plist2" placeholder="Select party" oninput="prev()"><button class="btn" style="white-space:nowrap" onclick="newParty()">+ New party</button></div></div></div>
+<div id="g_mail"><label>Product</label><input id="f_prod" list="plist" autocomplete="off" placeholder="Search or type a new product" oninput="prev()">
+<span id="np" class="newp hide">+ New product. It will be added to Product Master on save.</span>
+<div class="grid"><div><label>Cartons</label><input id="f_c" type="number" step="any" oninput="prev()"></div><div><label>Pcs per carton</label><input id="f_p" type="number" step="any" oninput="prev()"></div><div><label>Price (mail price)</label><input id="f_pr" type="number" step="any" oninput="prev()"></div></div></div>
+<div id="g_pay" class="hide"><div class="grid"><div><label>Cash amount</label><input id="f_cash" type="number" step="any" oninput="prev()"></div><div><label>Bank amount</label><input id="f_bank" type="number" step="any" oninput="prev()"></div></div></div>
+<div id="g_ext" class="hide"><label>Amount</label><input id="f_amt" type="number" step="any" oninput="prev()"></div>
+<div id="g_ct" class="hide"><label>Charge type</label><select id="f_ct"><option>Transport Charges</option><option>Other Charges</option></select></div>
 <div id="g_rem" class="hide"><label>Remark</label><input id="f_rem"></div>
 <p style="margin-bottom:0"><button class="pri" style="width:100%;padding:13px" onclick="saveEntry()">Save Entry</button></p></div>
-<div class="card sidep"><small>Original Total</small><b id="pvT">&#8377; 0.00</b><i id="pvF"></i><hr><small>Party Pending (atyare)</small><b id="pcur">-</b><small>Aa entry pachi</small><b id="pnew">-</b></div>
+<div class="card sidep"><small>Entry Total</small><b id="pvT">&#8377; 0.00</b><i id="pvF"></i><hr><small>Current Pending</small><b id="pcur">-</b><small>After this entry</small><b id="pnew">-</b></div>
 </div></div>
-<dialog id="dlg"><b id="dt" style="font-size:16px">Entry edit</b><div id="df"></div><div id="dw" class="warn hide">Aa entry "Matched" che. Edit karso to mark kadhi nakhase.</div><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#dlg').close()">Cancel</button> <button class="pri" onclick="saveEdit()">Save</button></p></dialog>
+<dialog id="npd"><b style="font-size:16px">New party</b><label>Party name</label><input id="np_n"><label>Opening balance</label><input id="np_o" type="number" step="any" placeholder="0"><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#npd').close()">Cancel</button> <button class="pri" onclick="saveParty()">Add party</button></p></dialog>
+<dialog id="dlg"><b id="dt" style="font-size:16px">Edit entry</b><div id="df"></div><div id="dw" class="warn hide">This entry is marked Matched. Editing will clear the mark.</div><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#dlg').close()">Cancel</button> <button class="pri" onclick="saveEdit()">Save</button></p></dialog>
 <div id="blk" class="tab hide"><div class="card noprint">
-<div class="bar"><div><label>Date (badha rows mate)</label><input id="b_date" type="date"></div>
+<div class="bar"><div><label>Date (applies to all rows)</label><input id="b_date" type="date"></div>
 <div style="flex:2"><label>Type</label><div class="seg" id="bseg" style="margin:0"><button data-k="mail" class="on" onclick="bKind('mail')">Mail Entry</button><button data-k="pay" onclick="bKind('pay')">Payment</button></div></div>
 <button class="btn" onclick="bAdd(5)">+ 5 rows</button></div>
 <div class="wrap" style="margin-top:12px;max-height:60vh;border:1px solid var(--line)"><table class="bt"><thead id="bh"></thead><tbody id="bb"></tbody></table></div>
-<p style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><button class="pri" onclick="bSave()">Save badhi entries</button><b id="bsum"></b></p>
-<small style="color:var(--mut)">Tip: Enter dabavo to bijo box. Excel mathi rows copy karine pehla box ma paste karo (Party, Product, Cartoon, Pcs, Price na kram ma).</small></div></div>
+<p style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><button class="pri" onclick="bSave()">Save all entries</button><b id="bsum"></b></p>
+<small style="color:var(--mut)">Tip: press Enter to move to the next box. Copy rows from Excel and paste into the first box (Mail: Party, Product, Cartons, Pcs, Price. Payment: Party, Cash, Bank, Remark).</small></div></div>
 
 <div id="lst" class="tab hide"><div class="card noprint">
-<div class="frow"><div><div class="flab">Su jovu che?</div><div class="pills" id="kp"><button class="pill on" data-v="">Badhi entry</button><button class="pill" data-v="MAIL">Faqat Mail</button><button class="pill" data-v="PAYMENT">Faqat Payment</button><button class="pill" data-v="EXTRA">Extra</button></div></div>
-<div style="flex:1;min-width:260px"><div class="flab">Party</div><div style="display:flex;gap:8px"><input id="lf_party" list="plist2" placeholder="Party nu naam (khali = badha party)" oninput="drawList()"><button class="pill on" id="allp" onclick="$('#lf_party').value='';drawList()">Badha party ek saathe</button></div></div></div>
-<div class="frow"><div><div class="flab">Tarikh</div><div class="pills" id="rp"><button class="pill" data-r="0">Aaj</button><button class="pill" data-r="1">Kal</button><button class="pill" data-r="7">7 divas</button><button class="pill" data-r="30">30 divas</button><button class="pill" data-r="-1">Badhu (juni pan)</button></div></div>
+<div class="frow"><div><div class="flab">Type</div><div class="pills" id="kp"><button class="pill on" data-v="">All entries</button><button class="pill" data-v="MAIL">Mail only</button><button class="pill" data-v="PAYMENT">Payments only</button><button class="pill" data-v="EXTRA">Extra</button></div></div>
+<div style="flex:1;min-width:260px"><div class="flab">Party</div><div style="display:flex;gap:8px"><input id="lf_party" list="plist2" placeholder="Party name (blank = all parties)" oninput="drawList()"><button class="pill on" id="allp" onclick="$('#lf_party').value='';drawList()">All parties</button></div></div></div>
+<div class="frow"><div><div class="flab">Date range</div><div class="pills" id="rp"><button class="pill" data-r="0">Today</button><button class="pill" data-r="1">Yesterday</button><button class="pill" data-r="7">7 days</button><button class="pill" data-r="30">30 days</button><button class="pill" data-r="-1">All (incl. old)</button></div></div>
 <div><div class="flab">From</div><input type="date" id="lf_from" onchange="clearRng();drawList()"></div><div><div class="flab">To</div><input type="date" id="lf_to" onchange="clearRng();drawList()"></div>
-<div><div class="flab">Tarikh kya thi</div><div class="pills" id="bp"><button class="pill" data-v="created">Entry kari te divas</button><button class="pill" data-v="date">Entry ni date</button></div></div>
+<div><div class="flab">Filter by</div><div class="pills" id="bp"><button class="pill" data-v="created">Entry made on</button><button class="pill" data-v="date">Entry date</button></div></div>
 <div style="margin-left:auto"><button class="btn" onclick="window.print()">Print</button></div></div>
 <input type="hidden" id="lf_by" value="created"><input type="hidden" id="lf_kind" value=""></div>
 <div class="card kpi"><div><small>Entries</small><b id="lk1">-</b></div><div><small>Purchase + Extra</small><b id="lk2">-</b></div><div><small>Payment</small><b id="lk3">-</b></div></div>
-<div class="card wrap"><table><thead><tr><th>Date</th><th>Party</th><th>Details</th><th class="n">Cartoon x Pcs</th><th class="n">Price</th><th class="n">Amount</th><th>Entry kari</th><th class="noprint"></th></tr></thead><tbody id="ll"></tbody></table></div></div>
+<div class="card wrap"><table><thead><tr><th>Date</th><th>Party</th><th>Details</th><th class="n">Cartons x Pcs</th><th class="n">Price</th><th class="n">Amount</th><th>Entered at</th><th class="noprint"></th></tr></thead><tbody id="ll"></tbody></table></div></div>
+<div id="ana" class="tab hide"><div class="card noprint"><div class="frow">
+<div><div class="flab">Period</div><div class="pills" id="ap"><button class="pill" data-r="m">This month</button><button class="pill" data-r="30">Last 30 days</button><button class="pill" data-r="90">Last 90 days</button><button class="pill" data-r="y">This year</button><button class="pill on" data-r="all">All time</button></div></div>
+<div><div class="flab">From</div><input type="date" id="a_from" onchange="anaCustom()"></div><div><div class="flab">To</div><input type="date" id="a_to" onchange="anaCustom()"></div></div>
+<div class="frow"><div style="flex:1;min-width:200px"><div class="flab">Party</div><input id="a_party" list="plist2" placeholder="All parties" oninput="drawAna()"></div>
+<div style="flex:1;min-width:200px"><div class="flab">Product</div><input id="a_prod" list="plist" placeholder="All products" oninput="drawAna()"></div>
+<div><div class="flab">Rank by</div><select id="a_sort" onchange="drawAna()"><option value="val">Value</option><option value="ctn">Cartons</option><option value="pcs">Pieces</option><option value="ord">Orders</option></select></div>
+<label class="chk"><input type="checkbox" id="a_cmp" onchange="drawAna()"> Compare with previous period</label><button class="btn" onclick="window.print()">Print</button></div></div>
+<div class="card kpi" id="a_kpi"></div>
+<div class="card"><h3>Monthly trend</h3><div class="cht" id="a_ch"></div><div class="lg"><span><s style="background:var(--pri)"></s>Purchase</span><span><s style="background:var(--ok)"></s>Payments received</span></div></div>
+<div class="card at"><h3>Products</h3><div class="wrap"><table class="at"><thead><tr><th>Product</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Pieces</th><th class="n">Value</th><th class="n">Avg price / pc</th><th>Share</th></tr></thead><tbody id="a_pt"></tbody></table></div></div>
+<div class="card at"><h3>Parties</h3><div class="wrap"><table class="at"><thead><tr><th>Party</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Purchase</th><th class="n">Avg order</th><th class="n">Payments</th><th>Share</th></tr></thead><tbody id="a_ptb"></tbody></table></div></div>
+</div>
 <datalist id="plist"></datalist><datalist id="plist2"></datalist>
 </main></section>
 
@@ -135,19 +162,19 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const say=(t,bad)=>{$('#msg').textContent=t||'';$('#msg').className=bad?'bad':'';};
 let syncSet=new Set(), syncT=null, syncBusy=0;
 function setSync(t,bad){ const e=$('#sync'); if(e){ e.textContent=t; e.style.color=bad?'#fb7185':'#94a3b8'; } }
-function queueSync(names){ [].concat(names).forEach(n=>n&&syncSet.add(n)); setSync('Sheet update thava ma...'); clearTimeout(syncT); syncT=setTimeout(runSync,2500); }
+function queueSync(names){ [].concat(names).forEach(n=>n&&syncSet.add(n)); setSync('Sync pending...'); clearTimeout(syncT); syncT=setTimeout(runSync,2500); }
 async function runSync(){
-  const names=[...syncSet]; syncSet=new Set(); if(!names.length) return; syncBusy++; setSync('Sheet update thai rahi che...');
-  try{ await call('rebuild',{parties:names}); setSync(syncBusy>1||syncSet.size?'Sheet update thai rahi che...':'\u2713 Sheet update thai'); }
-  catch(e){ setSync('Sheet update na thayu: '+e.message,true); }
+  const names=[...syncSet]; syncSet=new Set(); if(!names.length) return; syncBusy++; setSync('Syncing to sheet...');
+  try{ await call('rebuild',{parties:names}); setSync(syncBusy>1||syncSet.size?'Syncing to sheet...':'\u2713 Sheet synced'); }
+  catch(e){ setSync('Sheet sync failed: '+e.message,true); }
   syncBusy--;
 }
 window.addEventListener('beforeunload',e=>{ if(syncSet.size||syncBusy){ e.preventDefault(); e.returnValue=''; } });
 async function rebuildAllUi(){
-  if(!confirm('Party Summary ane badha party tab fari banavva ma 1-2 minute lagse. Chalu karvu?')) return;
-  setSync('Badhu fari banavi rahyo chu (1-2 minute)...'); say('Sheet refresh chalu che, tya sudhi bija kam na karo...');
-  try{ await call('rebuildAll'); setSync('\u2713 Badhu update thayu'); say('\u2713 Party Summary ane badha party tab update thaya'); }
-  catch(e){ setSync('Refresh na thayu',true); say(e.message,true); }
+  if(!confirm('Rebuild Party Summary and all party tabs? This takes 1-2 minutes.')) return;
+  setSync('Rebuilding everything (1-2 min)...'); say('Sheet rebuild in progress. Please avoid other actions until it finishes...');
+  try{ await call('rebuildAll'); setSync('\u2713 Rebuild complete'); say('\u2713 Party Summary and all party tabs updated'); }
+  catch(e){ setSync('Rebuild failed',true); say(e.message,true); }
 }
 const nowIso=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,19);
 //CALC-START
@@ -176,11 +203,11 @@ const pname=v=>{const x=D.parties.find(p=>p.name.toLowerCase()===String(v).trim(
 
 async function call(action,p={}){
   const r=await fetch(API,{method:'POST',body:JSON.stringify({key:KEY,action,...p})});
-  let j; try{ j=await r.json(); }catch(e){ throw new Error('Server no jawab samjayo nahi. Web App URL check karo.'); }
-  if(!j.ok){ if(/Unknown action/.test(j.error)) throw new Error('Google Apps Script ma NAVU Code.gs deploy karyu nathi. Apps Script ma: Deploy > Manage deployments > Edit (pencil) > Version: New version > Deploy.'); if(/lock/i.test(j.error)) throw new Error('Sheet busy che (update chalu che). 30 second pachi fari karo.'); throw new Error(j.error); } return j.data;
+  let j; try{ j=await r.json(); }catch(e){ throw new Error('Could not read the server response. Check the Web App URL.'); }
+  if(!j.ok){ if(/Unknown action/.test(j.error)) throw new Error('The new Code.gs is not deployed. In Apps Script: Deploy > Manage deployments > Edit > Version: New version > Deploy.'); if(/lock/i.test(j.error)) throw new Error('Sheet is busy (sync running). Try again in 30 seconds.'); throw new Error(j.error); } return j.data;
 }
 async function signIn(){
-  API=($('#au').value.trim()||API||DEFAULT_URL); KEY=$('#pw').value||KEY; $('#lerr').textContent='Checking...';
+  API=($('#au').value.trim()||API||DEFAULT_URL); KEY=$('#pw').value||KEY; $('#lerr').textContent='Signing in...';
   try{ await start(); localStorage.setItem('gs_url',API); localStorage.setItem('gs_key',KEY); }
   catch(e){ $('#lerr').textContent=e.message; $('#login').classList.remove('hide'); $('#app').classList.add('hide'); }
 }
@@ -188,7 +215,7 @@ function logout(){ localStorage.removeItem('gs_key'); localStorage.removeItem('g
 function tab(t){ document.querySelectorAll('.tab').forEach(e=>e.classList.add('hide')); $('#'+t).classList.remove('hide');
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); say(''); }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; tab(t);
-  if(t==='sum') drawSummary(); if(t==='lst'){ if(!$('#lf_from').value) listRange(0); else drawList(); } if(t==='blk'&&!$('#bb').children.length) bInit(); });
+  if(t==='sum') drawSummary(); if(t==='lst'){ if(!$('#lf_from').value) listRange(0); else drawList(); } if(t==='blk'&&!$('#bb').children.length) bInit(); if(t==='ana') anaRange(anaR); });
 
 async function start(){
   D=await call('getAll'); mult=D.mult||4; refresh(); $('#who').textContent='Owner · '+((API.match(/\/s\/([^/]+)/)||[])[1]||'').slice(0,8)+'…';
@@ -214,13 +241,13 @@ function drawSummary(){
 function openLedger(name){ $('#lp').value=name; tab('led'); loadLedger(); }
 
 function loadLedger(){
-  const name=pname($('#lp').value); if(!name){ $('#lb').innerHTML=''; return say($('#lp').value?'Aa naam ni party nathi':'',true); }
+  const name=pname($('#lp').value); if(!name){ $('#lb').innerHTML=''; return say($('#lp').value?'No such party':'',true); }
   const p=parties.find(x=>x.party_name===name), rows=ledgerRows(D,mult,name,p.opening_balance);
   $('#k0').textContent=name; $('#k1').textContent=fmt(p.opening_balance);
   $('#k2').textContent=fmt(p.final_pending); $('#k2').className=p.final_pending<0?'neg':'';
   const lm=[...rows].reverse().find(r=>r.m);
-  if(lm){ $('#k3').textContent=fd(lm.date); $('#k4').textContent='Pending tyare: '+fmt(lm.pending)+' · pachi '+(rows.length-1-rows.lastIndexOf(lm))+' entry'; }
-  else { $('#k3').textContent='-'; $('#k4').textContent='Hajji koi mark nathi'; }
+  if(lm){ $('#k3').textContent=fd(lm.date); $('#k4').textContent='Pending at that time: '+fmt(lm.pending)+' · '+(rows.length-1-rows.lastIndexOf(lm))+' entries since'; }
+  else { $('#k3').textContent='-'; $('#k4').textContent='No entry marked yet'; }
   $('#lb').innerHTML=rows.map(r=>{
     const act=`<button class="ic ${r.m?'ok':''}" title="Match mark" onclick="mark('${r.kind}','${r.id}',${!!r.m})">✓</button><button class="ic" title="Edit entry" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic" title="Note" data-n="${esc(r.note)}" onclick="editNote('${r.kind}','${r.id}',this)">💬</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button>`;
     return `<tr class="${r.kind} ${r.m?'m':''}"><td>${fd(r.date)}</td><td>${esc(name)}</td>
@@ -228,7 +255,7 @@ function loadLedger(){
     <td class="n">${r.cartons}</td><td class="n">${r.pcs}</td><td class="n">${fmt(r.price)}</td><td class="n">${fmt(r.total)}</td>
     <td class="n">${fmt(r.mode==='CASH'?r.payment:0)}</td><td class="n">${fmt(r.mode==='BANK'?r.payment:0)}</td>
     <td class="n"><b>${fmt(r.pending)}</b></td><td class="noprint n">${act}</td></tr>`}).join('');
-  say(rows.length+' entries · ✓ match mark, ✎ edit, 💬 note, × delete');
+  say(rows.length+' entries · ✓ matched, ✎ edit, 💬 note, × delete');
 }
 async function upd(kind,id,patch){
   try{ const L=D[LIST[kind]], i=L.findIndex(x=>x.id===id), oldP=i>=0?L[i].party:null; const row=await call('update',{sheet:SHEET[kind],id,patch}); if(i>=0) L[i]={...L[i],...row}; refresh(); queueSync([oldP,row.party]); redraw(); return true; }
@@ -236,10 +263,10 @@ async function upd(kind,id,patch){
 }
 function redraw(){ drawSummary(); if(!$('#lst').classList.contains('hide')) drawList(); }
 async function mark(kind,id,on){ if(await upd(kind,id,{matched_at:on?'':nowIso()})) loadLedger(); }
-async function editNote(kind,id,el){ const t=prompt('Note (khali rakho to kadhi nakhse):',el.dataset.n||''); if(t===null) return;
+async function editNote(kind,id,el){ const t=prompt('Note (leave blank to remove):',el.dataset.n||''); if(t===null) return;
   if(await upd(kind,id,{note:t.trim()})) loadLedger(); }
 async function del(kind,id){
-  if(!confirm('Aa entry delete karvi? (Sheet ma "Deleted Log" tab ma save rahe che, pachi male)')) return;
+  if(!confirm('Delete this entry? (A copy is kept in the "Deleted Log" tab.)')) return;
   try{ const L=D[LIST[kind]], en=L.find(x=>x.id===id); await call('delete',{sheet:SHEET[kind],id});
     D[LIST[kind]]=L.filter(x=>x.id!==id); refresh(); queueSync(en&&en.party); redraw(); loadLedger(); }
   catch(e){ say(e.message,true); }
@@ -249,7 +276,7 @@ async function editRow(kind,id){
   ed={kind,id,matched:!!r.matched_at};
   const f=(l,i,v,t,x)=>`<label>${l}</label><input id="e_${i}" type="${t||'text'}" value="${esc(v)}" ${x||''}>`;
   let h=f('Date','date',String(r.date).slice(0,10),'date')+f('Party','party',r.party,'text','list="plist2"');
-  if(kind==='MAIL') h+=f('Product','prod',r.product,'text','list="plist"')+f('Cartoon','c',r.cartons,'number','step="any"')+f('Cartoon Pcs','p',r.pcs,'number','step="any"')+f('Price (mail price)','pr',r.price,'number','step="any"');
+  if(kind==='MAIL') h+=f('Product','prod',r.product,'text','list="plist"')+f('Cartons','c',r.cartons,'number','step="any"')+f('Pcs per carton','p',r.pcs,'number','step="any"')+f('Price (mail price)','pr',r.price,'number','step="any"');
   else { h+=f('Amount','amt',r.amount,'number','step="any"');
     h+=kind==='PAYMENT'?`<label>Mode</label><select id="e_mode"><option ${String(r.mode).toUpperCase()==='CASH'?'selected':''}>CASH</option><option ${String(r.mode).toUpperCase()==='BANK'?'selected':''}>BANK</option></select>`:f('Charge type','ct',r.charge_type||'');
     h+=f('Remark','rem',r.remark||''); }
@@ -258,50 +285,59 @@ async function editRow(kind,id){
 }
 async function saveEdit(){
   const g=i=>$('#e_'+i).value, party=pname(g('party'));
-  if(!g('date')||!party) return alert('Date ane party list ma thi barabar select karo');
+  if(!g('date')||!party) return alert('Select a valid date and party from the list');
   const patch={date:g('date'),party};
-  if(ed.kind==='MAIL'){ if(!g('prod').trim()) return alert('Product lakho'); Object.assign(patch,{product:g('prod').trim(),cartons:+g('c')||0,pcs:+g('p')||0,price:+g('pr')||0}); }
-  else { const a=+g('amt'); if(!a) return alert('Amount lakho'); Object.assign(patch,{amount:a,remark:g('rem').trim()});
+  if(ed.kind==='MAIL'){ if(!g('prod').trim()) return alert('Enter a product'); Object.assign(patch,{product:g('prod').trim(),cartons:+g('c')||0,pcs:+g('p')||0,price:+g('pr')||0}); }
+  else { const a=+g('amt'); if(!a) return alert('Enter an amount'); Object.assign(patch,{amount:a,remark:g('rem').trim()});
     if(ed.kind==='PAYMENT') patch.mode=g('mode'); else patch.charge_type=g('ct').trim(); }
   if(ed.matched) patch.matched_at='';
-  if(await upd(ed.kind,ed.id,patch)){ $('#dlg').close(); loadLedger(); drawSummary(); say('✓ Edit thayu'); }
+  if(await upd(ed.kind,ed.id,patch)){ $('#dlg').close(); loadLedger(); drawSummary(); say('✓ Entry updated'); }
 }
 
 function kindUI(){ const k=$('#kind').value;
   $('#g_mail').classList.toggle('hide',k!=='mail'); $('#g_pay').classList.toggle('hide',k!=='pay');
-  $('#g_ext').classList.toggle('hide',k!=='ext'); $('#g_rem').classList.toggle('hide',k==='mail'); }
+  $('#g_ext').classList.toggle('hide',k!=='ext'); $('#g_ct').classList.toggle('hide',k!=='ext'); $('#g_rem').classList.toggle('hide',k==='mail'); }
 document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{ $('#kind').value=b.dataset.k;
   document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x===b)); kindUI(); prev(); });
 function prev(){
   const k=$('#kind').value, p=parties.find(x=>x.party_name===pname($('#f_party').value));
-  const amt=k==='mail'?(+$('#f_c').value||0)*(+$('#f_p').value||0)*(+$('#f_pr').value||0)*mult:(+$('#f_amt').value||0);
+  const amt=k==='mail'?(+$('#f_c').value||0)*(+$('#f_p').value||0)*(+$('#f_pr').value||0)*mult:k==='pay'?(+$('#f_cash').value||0)+(+$('#f_bank').value||0):(+$('#f_amt').value||0);
   const cur=p?Number(p.final_pending):null;
   $('#pvT').textContent='\u20B9 '+fmt(amt);
-  $('#pvF').textContent=k==='mail'?'Cartoon \u00D7 Pcs \u00D7 Price \u00D7 '+mult:k==='pay'?'Payment: pending ghatse':'Extra charge: pending vadhse';
+  $('#pvF').textContent=k==='mail'?'Cartons \u00D7 Pcs \u00D7 Price \u00D7 '+mult:k==='pay'?'Payment: reduces pending':'Extra charge: increases pending';
   $('#pcur').textContent=cur===null?'-':'\u20B9 '+fmt(cur); $('#pnew').textContent=cur===null?'-':'\u20B9 '+fmt(k==='pay'?cur-amt:cur+amt);
   const pn=$('#f_prod').value.trim(); $('#np').classList.toggle('hide',!(k==='mail'&&pn&&!prodSet.has(pn.toUpperCase())));
 }
+function newParty(){ $('#np_n').value=$('#f_party').value.trim(); $('#np_o').value=''; $('#npd').showModal(); }
+async function saveParty(){
+  const nm=$('#np_n').value.trim(); if(!nm) return alert('Enter party name');
+  if(pname(nm)) return alert('This party already exists');
+  try{ const pr=await call('add',{sheet:'Parties',row:{name:nm,opening_balance:+$('#np_o').value||0}}); D.parties.push(pr); refresh(); queueSync(nm);
+    $('#f_party').value=nm; $('#npd').close(); prev(); say('\u2713 Party added: '+nm); }
+  catch(e){ alert(e.message); }
+}
 async function saveEntry(){
-  const k=$('#kind').value, date=$('#f_date').value; let party=pname($('#f_party').value), sheet, row;
-  if(!date) return say('Date jaruri che',true);
-  if(!party){ const nm=$('#f_party').value.trim(); if(!nm) return say('Party lakho',true);
-    if(!confirm('"'+nm+'" navi party che. Party list ma add karvi?')) return;
+  const k=$('#kind').value, date=$('#f_date').value; let party=pname($('#f_party').value), sheet, rows=[];
+  if(!date) return say('Date is required',true);
+  if(!party){ const nm=$('#f_party').value.trim(); if(!nm) return say('Enter a party',true);
+    if(!confirm('"'+nm+'" is not in Party Master. Add it as a new party (opening balance 0)?')) return;
     try{ const pr=await call('add',{sheet:'Parties',row:{name:nm,opening_balance:0}}); D.parties.push(pr); refresh(); party=nm; }catch(e){ return say(e.message,true); } }
-  if(k==='mail'){ sheet='Mail'; const pn=$('#f_prod').value.trim(); if(!pn) return say('Product lakho',true);
-    row={date,party,product:pn,cartons:+$('#f_c').value||0,pcs:+$('#f_p').value||0,price:+$('#f_pr').value||0}; }
-  else if(k==='pay'){ sheet='Payments'; const a=+$('#f_amt').value; if(!a) return say('Amount lakho',true);
-    row={date,party,amount:a,mode:$('#f_mode').value,remark:$('#f_rem').value.trim()}; }
-  else { sheet='Extra'; const a=+$('#f_amt').value; if(!a) return say('Amount lakho',true);
-    row={date,party,charge_type:$('#f_ct').value,amount:a,remark:$('#f_rem').value.trim()}; }
+  const rem=$('#f_rem').value.trim();
+  if(k==='mail'){ sheet='Mail'; const pn=$('#f_prod').value.trim(); if(!pn) return say('Enter a product',true);
+    rows=[{date,party,product:pn,cartons:+$('#f_c').value||0,pcs:+$('#f_p').value||0,price:+$('#f_pr').value||0}]; }
+  else if(k==='pay'){ sheet='Payments'; const c=+$('#f_cash').value||0, b=+$('#f_bank').value||0; if(!(c>0)&&!(b>0)) return say('Enter a cash or bank amount',true);
+    if(c>0) rows.push({date,party,amount:c,mode:'CASH',remark:rem}); if(b>0) rows.push({date,party,amount:b,mode:'BANK',remark:rem}); }
+  else { sheet='Extra'; const a=+$('#f_amt').value; if(!a) return say('Enter an amount',true);
+    rows=[{date,party,charge_type:$('#f_ct').value,amount:a,remark:rem}]; }
   say('Saving...');
   try{
-    const saved=await call('add',{sheet,row}); D[{Mail:'mail',Payments:'pay',Extra:'ext'}[sheet]].push(saved);
-    let extra='';
+    const saved=await call('addMany',{sheet,rows}); D[{Mail:'mail',Payments:'pay',Extra:'ext'}[sheet]].push(...saved);
+    let extra=''; const row=rows[0];
     if(k==='mail'&&!prodSet.has(row.product.toUpperCase())){
-      try{ const pr=await call('add',{sheet:'Products',row:{name:row.product}}); D.products.push(pr); prodSet.add(row.product.toUpperCase()); $('#plist').insertAdjacentHTML('beforeend',`<option value="${esc(row.product)}">`); extra=' · navu product list ma add thayu'; }catch(e){ extra=' · (product list ma add na thayu)'; }
+      try{ const pr=await call('add',{sheet:'Products',row:{name:row.product}}); D.products.push(pr); prodSet.add(row.product.toUpperCase()); $('#plist').insertAdjacentHTML('beforeend',`<option value="${esc(row.product)}">`); extra=' \u00B7 new product added to Product Master'; }catch(e){ extra=' \u00B7 (could not add product to Product Master)'; }
     }
-    refresh(); queueSync(party); say('✓ Saved'+extra); ['f_prod','f_c','f_p','f_pr','f_amt','f_rem'].forEach(i=>$('#'+i).value=''); prev(); if(k==='mail') $('#f_prod').focus();
-  }catch(e){ say('Save na thayu: '+e.message,true); }
+    refresh(); queueSync(party); say('\u2713 Saved'+extra); ['f_prod','f_c','f_p','f_pr','f_amt','f_cash','f_bank','f_rem'].forEach(i=>$('#'+i).value=''); prev(); if(k==='mail') $('#f_prod').focus();
+  }catch(e){ say('Save failed: '+e.message,true); }
 }
 
 // ---------- Entry List ----------
@@ -341,13 +377,13 @@ function drawList(){
    <td>${r.kind==='PAYMENT'?`<span class="ch p">${esc(r.mode||'Payment')}</span>`:r.kind==='EXTRA'?'<span class="ch e">Extra</span>':''}${esc(r.remark)}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
    <td class="n">${esc(r.qty)}</td><td class="n">${r.price?fmt(r.price):''}</td><td class="n"><b>${fmt(r.amt)}</b></td>
    <td>${r.c?fd(r.c)+' '+r.c.slice(11,16):'-'}</td>
-   <td class="noprint n"><button class="ic" title="Edit" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button></td></tr>`).join('')||'<tr><td colspan="8" style="padding:20px;color:var(--mut)">Koi entry nathi. Juni entries mate upar <b>"Badhu (juni pan)"</b> dabavo.</td></tr>';
-  say(L.length>500?'Pehli 500 entries dekhay che. Date/party thi filter karo.':'');
+   <td class="noprint n"><button class="ic" title="Edit" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button></td></tr>`).join('')||'<tr><td colspan="8" style="padding:20px;color:var(--mut)">No entries found. For older entries click <b>"All (incl. old)"</b> above.</td></tr>';
+  say(L.length>500?'Showing the first 500 entries. Narrow with date or party filters.':'');
 }
 
 // ---------- Bulk Entry ----------
-const BC={mail:[['party','Party','plist2'],['prod','Product','plist'],['c','Cartoon'],['p','Pcs'],['pr','Price']],pay:[['party','Party','plist2'],['amt','Amount'],['mode','Mode'],['rem','Remark']]};
-const NUMC=['c','p','pr','amt']; let bk='mail';
+const BC={mail:[['party','Party','plist2'],['prod','Product','plist'],['c','Cartons'],['p','Pcs/Carton'],['pr','Price']],pay:[['party','Party','plist2'],['cash','Cash'],['bank','Bank'],['rem','Remark']]};
+const NUMC=['c','p','pr','amt','cash','bank']; let bk='mail';
 function bInit(){ $('#b_date').valueAsDate=new Date(); bKind('mail'); }
 function bKind(k){ bk=k; document.querySelectorAll('#bseg button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));
   $('#bh').innerHTML='<tr><th>#</th>'+BC[k].map(c=>`<th>${c[1]}</th>`).join('')+(k==='mail'?'<th class="n">Total</th>':'')+'<th></th></tr>'; $('#bb').innerHTML=''; bAdd(10); }
@@ -367,8 +403,8 @@ const bFilled=o=>Object.entries(o).some(([k,v])=>v&&k!=='party'&&k!=='mode');
 function bCalc(){
   let n=0,s=0;
   bRows().forEach(({tr,o},i)=>{ tr.firstElementChild.textContent=i+1; const f=bFilled(o); if(f) n++;
-    if(bk==='mail'){ const t=(+o.c||0)*(+o.p||0)*(+o.pr||0)*mult; tr.querySelector('.tot').textContent=t?fmt(t):''; if(f) s+=t; } else if(f) s+=+o.amt||0; });
-  $('#bsum').textContent=n+' entries · '+(bk==='mail'?'Total':'Payment')+' \u20B9 '+fmt(s);
+    if(bk==='mail'){ const t=(+o.c||0)*(+o.p||0)*(+o.pr||0)*mult; tr.querySelector('.tot').textContent=t?fmt(t):''; if(f) s+=t; } else if(f) s+=(+o.cash||0)+(+o.bank||0); });
+  $('#bsum').textContent=n+' entries · '+(bk==='mail'?'Total':'Payments')+' \u20B9 '+fmt(s);
 }
 function bPaste(txt,t){
   const cols=BC[bk].map(c=>c[0]); const ri=[...$('#bb').children].indexOf(t.closest('tr')), ci=cols.indexOf(t.dataset.c);
@@ -383,16 +419,16 @@ document.addEventListener('keydown',e=>{ if(e.key!=='Enter'||!e.target.classList
   let all=[...document.querySelectorAll('#bb .b-in')]; const i=all.indexOf(e.target); if(i===all.length-1) bAdd(1);
   all=[...document.querySelectorAll('#bb .b-in')]; if(all[i+1]) all[i+1].focus(); });
 async function bSave(){
-  const date=$('#b_date').value; if(!date) return say('Date lakho',true);
-  const R=bRows().filter(({o})=>bFilled(o)); if(!R.length) return say('Koi entry bharel nathi',true);
+  const date=$('#b_date').value; if(!date) return say('Date is required',true);
+  const R=bRows().filter(({o})=>bFilled(o)); if(!R.length) return say('No entries filled in',true);
   document.querySelectorAll('#bb tr').forEach(t=>t.classList.remove('err'));
   const unk=new Set(), bad=[], rows=[];
   R.forEach(({tr,o})=>{
     const pn=pname(o.party); if(!o.party){ bad.push(tr); return; } if(!pn) unk.add(o.party); const party=pn||o.party;
     if(bk==='mail'){ if(!o.prod){ bad.push(tr); return; } rows.push({date,party,product:o.prod,cartons:+o.c||0,pcs:+o.p||0,price:+o.pr||0}); }
-    else { if(!(+o.amt>0)){ bad.push(tr); return; } rows.push({date,party,amount:+o.amt,mode:o.mode||'CASH',remark:o.rem||''}); } });
-  if(bad.length){ bad.forEach(t=>t.classList.add('err')); return say(bad.length+' row ma party / product / amount khuta che (lal rang)',true); }
-  if(unk.size && !confirm('Aa navi party che: '+[...unk].join(', ')+'\nParty list ma add karvi?')) return;
+    else { const c=+o.cash||0,b=+o.bank||0; if(!(c>0)&&!(b>0)){ bad.push(tr); return; } if(c>0) rows.push({date,party,amount:c,mode:'CASH',remark:o.rem||''}); if(b>0) rows.push({date,party,amount:b,mode:'BANK',remark:o.rem||''}); } });
+  if(bad.length){ bad.forEach(t=>t.classList.add('err')); return say(bad.length+' row(s) have missing party / product / amount (highlighted red)',true); }
+  if(unk.size && !confirm('New parties: '+[...unk].join(', ')+'\nAdd them to Party Master?')) return;
   say('Saving '+rows.length+' entries...');
   try{
     if(unk.size){ const ps=await call('addMany',{sheet:'Parties',rows:[...unk].map(name=>({name,opening_balance:0}))}); D.parties.push(...ps); }
@@ -401,10 +437,54 @@ async function bSave(){
     if(bk==='mail'){ const m=new Map(); rows.forEach(r=>{ if(!prodSet.has(r.product.toUpperCase())) m.set(r.product.toUpperCase(),r.product); });
       if(m.size){ try{ const pr=await call('addMany',{sheet:'Products',rows:[...m.values()].map(name=>({name}))}); D.products.push(...pr);
         m.forEach((v,k)=>prodSet.add(k)); $('#plist').insertAdjacentHTML('beforeend',[...m.values()].map(p=>`<option value="${esc(p)}">`).join('')); np=m.size; }catch(e){} } }
-    refresh(); queueSync([...new Set(rows.map(r=>r.party))]); bKind(bk); say('✓ '+saved.length+' entries save thai'+(np?' · '+np+' navu product add thayu':''));
-  }catch(e){ say('Save na thayu: '+e.message+' (kain save thayu hoy to Entry List ma jovo)',true); }
+    refresh(); queueSync([...new Set(rows.map(r=>r.party))]); bKind(bk); say('✓ '+saved.length+' entries saved'+(np?' · '+np+' new product(s) added':''));
+  }catch(e){ say('Save failed: '+e.message+' (if anything was saved, check Entry List)',true); }
 }
-async function backup(){ say('Backup banavi rahyo chu...'); try{ const n=await call('backup'); say('✓ Backup bani: '+n+' (Google Drive ma)'); }catch(e){ say(e.message,true); } }
+
+// ---------- Analytics ----------
+let anaR='all';
+const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const cmp=n=>n>=1e7?(n/1e7).toFixed(2)+'Cr':n>=1e5?(n/1e5).toFixed(1)+'L':n>=1e3?(n/1e3).toFixed(1)+'k':Math.round(n)+'';
+function anaRange(r){ anaR=r; const t=today();
+  $('#a_from').value=r==='m'?t.slice(0,8)+'01':r==='30'?addDays(t,-29):r==='90'?addDays(t,-89):r==='y'?t.slice(0,4)+'-01-01':'';
+  $('#a_to').value=r==='all'?'':t;
+  document.querySelectorAll('#ap .pill').forEach(x=>x.classList.toggle('on',x.dataset.r===r)); drawAna(); }
+function anaCustom(){ anaR='x'; document.querySelectorAll('#ap .pill').forEach(x=>x.classList.remove('on')); drawAna(); }
+document.querySelectorAll('#ap .pill').forEach(b=>b.onclick=()=>anaRange(b.dataset.r));
+function aggregate(a,b,pn,pr){
+  const R={val:0,ctn:0,pcs:0,ord:0,cash:0,bank:0,days:new Set(),prod:{},party:{},month:{}};
+  const inR=d=>{ d=String(d).slice(0,10); return d&&(!a||d>=a)&&(!b||d<=b); };
+  const PA=n=>R.party[n]=R.party[n]||{n,ord:0,ctn:0,pcs:0,val:0,pay:0}, MO=m=>R.month[m]=R.month[m]||{p:0,r:0};
+  D.mail.filter(live).forEach(r=>{
+    if(!inR(r.date)||(pn&&r.party!==pn)||(pr&&String(r.product).toUpperCase()!==pr)) return;
+    const q=num(r.cartons)*num(r.pcs), v=q*num(r.price)*mult, k=String(r.product).toUpperCase();
+    R.val+=v; R.ctn+=num(r.cartons); R.pcs+=q; R.ord++; R.days.add(String(r.date).slice(0,10));
+    const P=R.prod[k]=R.prod[k]||{n:r.product,ord:0,ctn:0,pcs:0,val:0}; P.ord++; P.ctn+=num(r.cartons); P.pcs+=q; P.val+=v;
+    const Q=PA(r.party); Q.ord++; Q.ctn+=num(r.cartons); Q.pcs+=q; Q.val+=v; MO(String(r.date).slice(0,7)).p+=v; });
+  if(!pr) D.pay.filter(live).forEach(r=>{
+    if(!inR(r.date)||(pn&&r.party!==pn)) return; const a=num(r.amount);
+    if(String(r.mode).toUpperCase()==='BANK') R.bank+=a; else R.cash+=a; PA(r.party).pay+=a; MO(String(r.date).slice(0,7)).r+=a; });
+  return R;
+}
+function drawAna(){
+  const f=$('#a_from').value,t=$('#a_to').value,pn=pname($('#a_party').value)||'',pr=$('#a_prod').value.trim().toUpperCase();
+  const A=aggregate(f,t,pn,pr), sk=$('#a_sort').value;
+  let B=null; if($('#a_cmp').checked&&f&&t){ const len=Math.round((new Date(t)-new Date(f))/864e5)+1; B=aggregate(addDays(f,-len),addDays(f,-1),pn,pr); }
+  const pay=A.cash+A.bank, nd=A.days.size;
+  const dl=(a,b)=>!B?'':(b?`<i class="${a>=b?'up':'dn'}">${a>=b?'▲':'▼'} ${Math.abs((a-b)/b*100).toFixed(1)}% vs ${Number.isInteger(b)?b.toLocaleString('en-IN'):fmt(b)}</i>`:'<i>no previous data</i>');
+  const K=(l,v,x)=>`<div><small>${l}</small><b>${v}</b>${x||''}</div>`;
+  $('#a_kpi').innerHTML=K('Purchase value','₹ '+fmt(A.val),dl(A.val,B&&B.val))+K('Orders',A.ord,dl(A.ord,B&&B.ord))+K('Cartons',fmt(A.ctn).replace('.00',''),dl(A.ctn,B&&B.ctn))+K('Pieces',Math.round(A.pcs).toLocaleString('en-IN'),dl(A.pcs,B&&B.pcs))
+   +K('Avg order value','₹ '+fmt(A.ord?A.val/A.ord:0))+K('Avg price / piece','₹ '+fmt(A.pcs?A.val/A.pcs:0))+K('Avg per active day','₹ '+fmt(nd?A.val/nd:0),'<i>'+nd+' active days</i>')
+   +(pr?'':K('Payments received','₹ '+fmt(pay),dl(pay,B&&(B.cash+B.bank))+'<i>Cash '+fmt(A.cash)+' ('+(pay?Math.round(A.cash/pay*100):0)+'%) · Bank '+fmt(A.bank)+'</i>'));
+  const ms=Object.keys(A.month).sort().slice(-24), mx=Math.max(1,...ms.map(m=>Math.max(A.month[m].p,A.month[m].r)));
+  $('#a_ch').innerHTML=ms.map(m=>{ const o=A.month[m]; return `<div class="cg" title="${MN[+m.slice(5)-1]} ${m.slice(0,4)}: Purchase ${fmt(o.p)} | Payments ${fmt(o.r)}"><em>${cmp(o.p)}</em><div class="cb"><i style="height:${o.p/mx*100}%;background:var(--pri)"></i><i style="height:${o.r/mx*100}%;background:var(--ok)"></i></div><small>${MN[+m.slice(5)-1]} '${m.slice(2,4)}</small></div>`; }).join('')||'<div style="color:var(--mut)">No data for this filter.</div>';
+  const top=(o)=>Object.values(o).sort((a,b)=>b[sk]-a[sk]).slice(0,100);
+  const sh=(x,tot)=>`<td><div class="sh"><i style="width:${tot?x/tot*100:0}%"></i></div><small style="color:var(--mut)">${tot?(x/tot*100).toFixed(1):0}%</small></td>`;
+  $('#a_pt').innerHTML=top(A.prod).map(p=>`<tr><td><b>${esc(p.n)}</b></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n">${p.pcs.toLocaleString('en-IN')}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.pcs?p.val/p.pcs:0)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
+  $('#a_ptb').innerHTML=top(A.party).map(p=>`<tr><td><b>${esc(p.n)}</b></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.ord?p.val/p.ord:0)}</td><td class="n">${fmt(p.pay)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
+  say(pr?'Payments are not shown when a product filter is set.':($('#a_cmp').checked&&!(f&&t)?'Select both From and To dates to compare with the previous period.':''));
+}
+async function backup(){ say('Creating backup...'); try{ const n=await call('backup'); say('✓ Backup created: '+n+' (in Google Drive)'); }catch(e){ say(e.message,true); } }
 
 if(DEFAULT_URL) $('#urlrow').classList.add('hide');
 if(API&&KEY){ $('#au').value=API; $('#pw').value=KEY; signIn(); } else { $('#login').classList.remove('hide'); if(API) $('#au').value=API; }
