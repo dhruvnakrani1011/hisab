@@ -52,6 +52,9 @@ th{z-index:4}
 @media(max-width:900px){.ent-grid{grid-template-columns:1fr}.card.wrap{max-height:none}}
 .bt{min-width:780px}.bt td{padding:4px 5px;border-bottom:0;vertical-align:middle}.bt th{position:static}.bt input,.bt select{padding:8px;border-radius:8px}
 .bt tr.err input,.bt tr.err select{border-color:var(--red);background:var(--ext)}.bt .tot{font-weight:700;text-align:right;white-space:nowrap;min-width:110px}
+.pills{display:flex;gap:6px;flex-wrap:wrap}.pill{border:1px solid var(--line);background:var(--card);padding:8px 15px;border-radius:999px;font-weight:600;font-size:13px;color:var(--mut);white-space:nowrap}
+.pill:hover{border-color:var(--pri)}.pill.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.frow{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}.frow+.frow{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}.flab{font-size:12px;font-weight:600;color:var(--mut);margin-bottom:6px}
 #lst td{vertical-align:middle}
 #msg{min-height:20px;margin:0 0 10px;color:var(--mut)}#msg.bad{color:var(--red)}
 a.pn{color:var(--ink);font-weight:600;cursor:pointer;text-decoration:none}a.pn:hover{color:var(--pri)}
@@ -111,12 +114,14 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);co
 <p style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><button class="pri" onclick="bSave()">Save badhi entries</button><b id="bsum"></b></p>
 <small style="color:var(--mut)">Tip: Enter dabavo to bijo box. Excel mathi rows copy karine pehla box ma paste karo (Party, Product, Cartoon, Pcs, Price na kram ma).</small></div></div>
 
-<div id="lst" class="tab hide"><div class="card bar noprint">
-<div><label>Kya thi shodhvu</label><select id="lf_by" onchange="drawList()"><option value="created">Me entry kari te divas thi</option><option value="date">Entry ni date thi</option></select></div>
-<div><label>From</label><input type="date" id="lf_from" onchange="drawList()"></div><div><label>To</label><input type="date" id="lf_to" onchange="drawList()"></div>
-<div><label>Party</label><input id="lf_party" list="plist2" placeholder="badha" oninput="drawList()"></div>
-<div><label>Type</label><select id="lf_kind" onchange="drawList()"><option value="">Badha</option><option value="MAIL">Mail</option><option value="PAYMENT">Payment</option><option value="EXTRA">Extra</option></select></div>
-<button class="btn" onclick="listRange(0)">Aaj</button><button class="btn" onclick="listRange(1)">Kal</button><button class="btn" onclick="listRange(7)">7 divas</button><button class="btn" onclick="listRange(-1)">Badhu (juni pan)</button><button class="btn" onclick="window.print()">Print</button></div>
+<div id="lst" class="tab hide"><div class="card noprint">
+<div class="frow"><div><div class="flab">Su jovu che?</div><div class="pills" id="kp"><button class="pill on" data-v="">Badhi entry</button><button class="pill" data-v="MAIL">Faqat Mail</button><button class="pill" data-v="PAYMENT">Faqat Payment</button><button class="pill" data-v="EXTRA">Extra</button></div></div>
+<div style="flex:1;min-width:260px"><div class="flab">Party</div><div style="display:flex;gap:8px"><input id="lf_party" list="plist2" placeholder="Party nu naam (khali = badha party)" oninput="drawList()"><button class="pill on" id="allp" onclick="$('#lf_party').value='';drawList()">Badha party ek saathe</button></div></div></div>
+<div class="frow"><div><div class="flab">Tarikh</div><div class="pills" id="rp"><button class="pill" data-r="0">Aaj</button><button class="pill" data-r="1">Kal</button><button class="pill" data-r="7">7 divas</button><button class="pill" data-r="30">30 divas</button><button class="pill" data-r="-1">Badhu (juni pan)</button></div></div>
+<div><div class="flab">From</div><input type="date" id="lf_from" onchange="clearRng();drawList()"></div><div><div class="flab">To</div><input type="date" id="lf_to" onchange="clearRng();drawList()"></div>
+<div><div class="flab">Tarikh kya thi</div><div class="pills" id="bp"><button class="pill" data-v="created">Entry kari te divas</button><button class="pill" data-v="date">Entry ni date</button></div></div>
+<div style="margin-left:auto"><button class="btn" onclick="window.print()">Print</button></div></div>
+<input type="hidden" id="lf_by" value="created"><input type="hidden" id="lf_kind" value=""></div>
 <div class="card kpi"><div><small>Entries</small><b id="lk1">-</b></div><div><small>Purchase + Extra</small><b id="lk2">-</b></div><div><small>Payment</small><b id="lk3">-</b></div></div>
 <div class="card wrap"><table><thead><tr><th>Date</th><th>Party</th><th>Details</th><th class="n">Cartoon x Pcs</th><th class="n">Price</th><th class="n">Amount</th><th>Entry kari</th><th class="noprint"></th></tr></thead><tbody id="ll"></tbody></table></div></div>
 <datalist id="plist"></datalist><datalist id="plist2"></datalist>
@@ -147,7 +152,7 @@ function ledgerRows(D,mult,name,opening){
   let p=opening; o.forEach(r=>{p+=r.total-r.payment; r.pending=p;}); return o;
 }
 //CALC-END
-const DEFAULT_URL="https://script.google.com/macros/s/AKfycbxyBoPXXUHejUliy5ibTbV8iH_Wm_WrBi1OuFgxHlhrsnmIsvmImyUoV3o-csVAlH5_/exec"; // optional: ahi Web App URL paste karo to kyarey puchse nahi
+const DEFAULT_URL=""; // optional: ahi Web App URL paste karo to kyarey puchse nahi
 let API=localStorage.getItem('gs_url')||DEFAULT_URL, KEY=localStorage.getItem('gs_key')||'';
 let D={parties:[],products:[],mail:[],pay:[],ext:[],mult:4}, parties=[], mult=4, ed=null, prodSet=new Set();
 const SHEET={MAIL:'Mail',PAYMENT:'Payments',EXTRA:'Extra'}, LIST={MAIL:'mail',PAYMENT:'pay',EXTRA:'ext'};
@@ -156,7 +161,7 @@ const pname=v=>{const x=D.parties.find(p=>p.name.toLowerCase()===String(v).trim(
 async function call(action,p={}){
   const r=await fetch(API,{method:'POST',body:JSON.stringify({key:KEY,action,...p})});
   let j; try{ j=await r.json(); }catch(e){ throw new Error('Server no jawab samjayo nahi. Web App URL check karo.'); }
-  if(!j.ok) throw new Error(j.error); return j.data;
+  if(!j.ok){ if(/Unknown action/.test(j.error)) throw new Error('Google Apps Script ma NAVU Code.gs deploy karyu nathi. Apps Script ma: Deploy > Manage deployments > Edit (pencil) > Version: New version > Deploy.'); throw new Error(j.error); } return j.data;
 }
 async function signIn(){
   API=($('#au').value.trim()||API||DEFAULT_URL); KEY=$('#pw').value||KEY; $('#lerr').textContent='Checking...';
@@ -284,7 +289,21 @@ async function saveEntry(){
 // ---------- Entry List ----------
 const today=()=>nowIso().slice(0,10);
 const addDays=(s,n)=>{ const d=new Date(s+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
-function listRange(n){ const t=today(); if(n===-1){ $('#lf_by').value='date'; $('#lf_from').value=''; $('#lf_to').value=''; return drawList(); } $('#lf_from').value=n===7?addDays(t,-6):n===1?addDays(t,-1):t; $('#lf_to').value=n===1?addDays(t,-1):t; drawList(); }
+function listRange(n){
+  const t=today();
+  if(n===-1){ $('#lf_by').value='date'; $('#lf_from').value=''; $('#lf_to').value=''; }
+  else { $('#lf_from').value=n===0?t:n===1?addDays(t,-1):addDays(t,-(n-1)); $('#lf_to').value=n===1?addDays(t,-1):t; }
+  document.querySelectorAll('#rp .pill').forEach(x=>x.classList.toggle('on',+x.dataset.r===n)); drawList();
+}
+const clearRng=()=>document.querySelectorAll('#rp .pill').forEach(x=>x.classList.remove('on'));
+function syncPills(){
+  document.querySelectorAll('#kp .pill').forEach(b=>b.classList.toggle('on',b.dataset.v===$('#lf_kind').value));
+  document.querySelectorAll('#bp .pill').forEach(b=>b.classList.toggle('on',b.dataset.v===$('#lf_by').value));
+  $('#allp').classList.toggle('on',!$('#lf_party').value.trim());
+}
+document.querySelectorAll('#kp .pill').forEach(b=>b.onclick=()=>{ $('#lf_kind').value=b.dataset.v; drawList(); });
+document.querySelectorAll('#bp .pill').forEach(b=>b.onclick=()=>{ $('#lf_by').value=b.dataset.v; drawList(); });
+document.querySelectorAll('#rp .pill').forEach(b=>b.onclick=()=>listRange(+b.dataset.r));
 function allEntries(){
   const o=[], m=mult;
   D.mail.filter(live).forEach(r=>o.push({kind:'MAIL',id:r.id,date:r.date,party:r.party,remark:r.product,qty:num(r.cartons)+' x '+num(r.pcs),price:num(r.price)*m,amt:num(r.cartons)*num(r.pcs)*num(r.price)*m,mode:'',c:r.created_at||'',seq:r._r,note:r.note}));
@@ -293,6 +312,7 @@ function allEntries(){
   return o;
 }
 function drawList(){
+  syncPills();
   const by=$('#lf_by').value, f=$('#lf_from').value, t=$('#lf_to').value, pn=$('#lf_party').value.trim().toLowerCase(), k=$('#lf_kind').value;
   let L=allEntries().filter(r=>{ const d=by==='created'?r.c.slice(0,10):String(r.date).slice(0,10); if(!d) return false;
     return (!f||d>=f)&&(!t||d<=t)&&(!k||r.kind===k)&&(!pn||r.party.toLowerCase().includes(pn)); });
