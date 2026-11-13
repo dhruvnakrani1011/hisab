@@ -50,6 +50,9 @@ th{z-index:4}
 .sidep small{color:var(--mut);font-weight:600}.sidep b{display:block;font-size:26px;letter-spacing:-.5px;margin:2px 0 4px}.sidep hr{border:0;border-top:1px dashed var(--line);margin:14px 0}.sidep i{font-size:12px;color:var(--mut);font-style:normal}
 .newp{display:block;margin-top:6px;font-size:12px;color:#b45309;background:var(--ext);border-radius:8px;padding:6px 10px}
 @media(max-width:900px){.ent-grid{grid-template-columns:1fr}.card.wrap{max-height:none}}
+.bt{min-width:780px}.bt td{padding:4px 5px;border-bottom:0;vertical-align:middle}.bt th{position:static}.bt input,.bt select{padding:8px;border-radius:8px}
+.bt tr.err input,.bt tr.err select{border-color:var(--red);background:var(--ext)}.bt .tot{font-weight:700;text-align:right;white-space:nowrap;min-width:110px}
+#lst td{vertical-align:middle}
 #msg{min-height:20px;margin:0 0 10px;color:var(--mut)}#msg.bad{color:var(--red)}
 a.pn{color:var(--ink);font-weight:600;cursor:pointer;text-decoration:none}a.pn:hover{color:var(--pri)}
 dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:20px;width:min(460px,94vw)}dialog::backdrop{background:rgba(15,23,42,.5)}.warn{background:var(--ext);border-radius:10px;padding:9px 11px;font-size:12px;margin-top:8px}
@@ -67,7 +70,7 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);co
 
 <section id="app" class="hide">
 <header><span class="logo">Party Hisab</span>
-<nav><button data-t="sum">&#9638;&nbsp; Summary</button><button data-t="led">&#9776;&nbsp; Ledger</button><button data-t="ent">&#65291;&nbsp; New Entry</button></nav>
+<nav><button data-t="sum">&#9638;&nbsp; Summary</button><button data-t="led">&#9776;&nbsp; Ledger</button><button data-t="ent">&#65291;&nbsp; New Entry</button><button data-t="blk">&#9638;&nbsp; Bulk Entry</button><button data-t="lst">&#9776;&nbsp; Entry List</button></nav>
 <span id="who">Owner</span><button class="btn" onclick="backup()">Backup</button><button class="btn" onclick="logout()">Lock</button></header>
 <main><div id="msg"></div>
 
@@ -100,6 +103,22 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);co
 <div class="card sidep"><small>Original Total</small><b id="pvT">&#8377; 0.00</b><i id="pvF"></i><hr><small>Party Pending (atyare)</small><b id="pcur">-</b><small>Aa entry pachi</small><b id="pnew">-</b></div>
 </div></div>
 <dialog id="dlg"><b id="dt" style="font-size:16px">Entry edit</b><div id="df"></div><div id="dw" class="warn hide">Aa entry "Matched" che. Edit karso to mark kadhi nakhase.</div><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#dlg').close()">Cancel</button> <button class="pri" onclick="saveEdit()">Save</button></p></dialog>
+<div id="blk" class="tab hide"><div class="card noprint">
+<div class="bar"><div><label>Date (badha rows mate)</label><input id="b_date" type="date"></div>
+<div style="flex:2"><label>Type</label><div class="seg" id="bseg" style="margin:0"><button data-k="mail" class="on" onclick="bKind('mail')">Mail Entry</button><button data-k="pay" onclick="bKind('pay')">Payment</button></div></div>
+<button class="btn" onclick="bAdd(5)">+ 5 rows</button></div>
+<div class="wrap" style="margin-top:12px;max-height:60vh;border:1px solid var(--line)"><table class="bt"><thead id="bh"></thead><tbody id="bb"></tbody></table></div>
+<p style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><button class="pri" onclick="bSave()">Save badhi entries</button><b id="bsum"></b></p>
+<small style="color:var(--mut)">Tip: Enter dabavo to bijo box. Excel mathi rows copy karine pehla box ma paste karo (Party, Product, Cartoon, Pcs, Price na kram ma).</small></div></div>
+
+<div id="lst" class="tab hide"><div class="card bar noprint">
+<div><label>Kya thi shodhvu</label><select id="lf_by" onchange="drawList()"><option value="created">Me entry kari te divas thi</option><option value="date">Entry ni date thi</option></select></div>
+<div><label>From</label><input type="date" id="lf_from" onchange="drawList()"></div><div><label>To</label><input type="date" id="lf_to" onchange="drawList()"></div>
+<div><label>Party</label><input id="lf_party" list="plist2" placeholder="badha" oninput="drawList()"></div>
+<div><label>Type</label><select id="lf_kind" onchange="drawList()"><option value="">Badha</option><option value="MAIL">Mail</option><option value="PAYMENT">Payment</option><option value="EXTRA">Extra</option></select></div>
+<button class="btn" onclick="listRange(0)">Aaj</button><button class="btn" onclick="listRange(1)">Kal</button><button class="btn" onclick="listRange(7)">7 divas</button><button class="btn" onclick="window.print()">Print</button></div>
+<div class="card kpi"><div><small>Entries</small><b id="lk1">-</b></div><div><small>Purchase + Extra</small><b id="lk2">-</b></div><div><small>Payment</small><b id="lk3">-</b></div></div>
+<div class="card wrap"><table><thead><tr><th>Date</th><th>Party</th><th>Details</th><th class="n">Cartoon x Pcs</th><th class="n">Price</th><th class="n">Amount</th><th>Entry kari</th><th class="noprint"></th></tr></thead><tbody id="ll"></tbody></table></div></div>
 <datalist id="plist"></datalist><datalist id="plist2"></datalist>
 </main></section>
 
@@ -128,7 +147,8 @@ function ledgerRows(D,mult,name,opening){
   let p=opening; o.forEach(r=>{p+=r.total-r.payment; r.pending=p;}); return o;
 }
 //CALC-END
-let API=localStorage.getItem('gs_url')||'', KEY=localStorage.getItem('gs_key')||'';
+const DEFAULT_URL=""; // optional: ahi Web App URL paste karo to kyarey puchse nahi
+let API=localStorage.getItem('gs_url')||DEFAULT_URL, KEY=localStorage.getItem('gs_key')||'';
 let D={parties:[],products:[],mail:[],pay:[],ext:[],mult:4}, parties=[], mult=4, ed=null, prodSet=new Set();
 const SHEET={MAIL:'Mail',PAYMENT:'Payments',EXTRA:'Extra'}, LIST={MAIL:'mail',PAYMENT:'pay',EXTRA:'ext'};
 const pname=v=>{const x=D.parties.find(p=>p.name.toLowerCase()===String(v).trim().toLowerCase());return x?x.name:null;};
@@ -139,14 +159,15 @@ async function call(action,p={}){
   if(!j.ok) throw new Error(j.error); return j.data;
 }
 async function signIn(){
-  API=$('#au').value.trim()||API; KEY=$('#pw').value||KEY; $('#lerr').textContent='Checking...';
+  API=($('#au').value.trim()||API||DEFAULT_URL); KEY=$('#pw').value||KEY; $('#lerr').textContent='Checking...';
   try{ await start(); localStorage.setItem('gs_url',API); localStorage.setItem('gs_key',KEY); }
   catch(e){ $('#lerr').textContent=e.message; $('#login').classList.remove('hide'); $('#app').classList.add('hide'); }
 }
 function logout(){ localStorage.removeItem('gs_key'); location.reload(); }
 function tab(t){ document.querySelectorAll('.tab').forEach(e=>e.classList.add('hide')); $('#'+t).classList.remove('hide');
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); say(''); }
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ tab(b.dataset.t); if(b.dataset.t==='sum') drawSummary(); });
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; tab(t);
+  if(t==='sum') drawSummary(); if(t==='lst'){ if(!$('#lf_from').value) listRange(0); else drawList(); } if(t==='blk'&&!$('#bb').children.length) bInit(); });
 
 async function start(){
   D=await call('getAll'); mult=D.mult||4; refresh();
@@ -189,9 +210,10 @@ function loadLedger(){
   say(rows.length+' entries · ✓ match mark, ✎ edit, 💬 note, × delete');
 }
 async function upd(kind,id,patch){
-  try{ const row=await call('update',{sheet:SHEET[kind],id,patch}); const L=D[LIST[kind]], i=L.findIndex(x=>x.id===id); if(i>=0) L[i]={...L[i],...row}; refresh(); return true; }
+  try{ const row=await call('update',{sheet:SHEET[kind],id,patch}); const L=D[LIST[kind]], i=L.findIndex(x=>x.id===id); if(i>=0) L[i]={...L[i],...row}; refresh(); redraw(); return true; }
   catch(e){ say(e.message,true); return false; }
 }
+function redraw(){ drawSummary(); if(!$('#lst').classList.contains('hide')) drawList(); }
 async function mark(kind,id,on){ if(await upd(kind,id,{matched_at:on?'':nowIso()})) loadLedger(); }
 async function editNote(kind,id,el){ const t=prompt('Note (khali rakho to kadhi nakhse):',el.dataset.n||''); if(t===null) return;
   if(await upd(kind,id,{note:t.trim()})) loadLedger(); }
@@ -258,7 +280,94 @@ async function saveEntry(){
     refresh(); say('✓ Saved'+extra); ['f_prod','f_c','f_p','f_pr','f_amt','f_rem'].forEach(i=>$('#'+i).value=''); prev(); if(k==='mail') $('#f_prod').focus();
   }catch(e){ say('Save na thayu: '+e.message,true); }
 }
+
+// ---------- Entry List ----------
+const today=()=>nowIso().slice(0,10);
+const addDays=(s,n)=>{ const d=new Date(s+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+function listRange(n){ const t=today(); $('#lf_from').value=n===7?addDays(t,-6):n===1?addDays(t,-1):t; $('#lf_to').value=n===1?addDays(t,-1):t; drawList(); }
+function allEntries(){
+  const o=[], m=mult;
+  D.mail.filter(live).forEach(r=>o.push({kind:'MAIL',id:r.id,date:r.date,party:r.party,remark:r.product,qty:num(r.cartons)+' x '+num(r.pcs),price:num(r.price)*m,amt:num(r.cartons)*num(r.pcs)*num(r.price)*m,mode:'',c:r.created_at||'',seq:r._r,note:r.note}));
+  D.ext.filter(live).forEach(r=>o.push({kind:'EXTRA',id:r.id,date:r.date,party:r.party,remark:((r.charge_type||'')+' '+(r.remark||'')).trim(),qty:'',price:0,amt:num(r.amount),mode:'',c:r.created_at||'',seq:r._r,note:r.note}));
+  D.pay.filter(live).forEach(r=>o.push({kind:'PAYMENT',id:r.id,date:r.date,party:r.party,remark:r.remark,qty:'',price:0,amt:num(r.amount),mode:String(r.mode).toUpperCase(),c:r.created_at||'',seq:r._r,note:r.note}));
+  return o;
+}
+function drawList(){
+  const by=$('#lf_by').value, f=$('#lf_from').value, t=$('#lf_to').value, pn=$('#lf_party').value.trim().toLowerCase(), k=$('#lf_kind').value;
+  let L=allEntries().filter(r=>{ const d=by==='created'?r.c.slice(0,10):String(r.date).slice(0,10); if(!d) return false;
+    return (!f||d>=f)&&(!t||d<=t)&&(!k||r.kind===k)&&(!pn||r.party.toLowerCase().includes(pn)); });
+  L.sort((a,b)=>by==='created'?((b.c>a.c?1:b.c<a.c?-1:0)||(b.date>a.date?1:b.date<a.date?-1:0)||b.seq-a.seq):((b.date>a.date?1:b.date<a.date?-1:0)||(b.c>a.c?1:b.c<a.c?-1:0)||b.seq-a.seq));
+  $('#lk1').textContent=L.length; $('#lk2').textContent='\u20B9 '+fmt(L.filter(r=>r.kind!=='PAYMENT').reduce((a,r)=>a+r.amt,0)); $('#lk3').textContent='\u20B9 '+fmt(L.filter(r=>r.kind==='PAYMENT').reduce((a,r)=>a+r.amt,0));
+  const shown=L.slice(0,500);
+  $('#ll').innerHTML=shown.map(r=>`<tr class="${r.kind}"><td>${fd(r.date)}</td><td><b>${esc(r.party)}</b></td>
+   <td>${r.kind==='PAYMENT'?`<span class="ch p">${esc(r.mode||'Payment')}</span>`:r.kind==='EXTRA'?'<span class="ch e">Extra</span>':''}${esc(r.remark)}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
+   <td class="n">${esc(r.qty)}</td><td class="n">${r.price?fmt(r.price):''}</td><td class="n"><b>${fmt(r.amt)}</b></td>
+   <td>${r.c?fd(r.c)+' '+r.c.slice(11,16):'-'}</td>
+   <td class="noprint n"><button class="ic" title="Edit" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button></td></tr>`).join('')||'<tr><td colspan="8" style="padding:20px;color:var(--mut)">Koi entry nathi. "Entry ni date thi" try karo ke date badlo.</td></tr>';
+  say(L.length>500?'Pehli 500 entries dekhay che. Date/party thi filter karo.':'');
+}
+
+// ---------- Bulk Entry ----------
+const BC={mail:[['party','Party','plist2'],['prod','Product','plist'],['c','Cartoon'],['p','Pcs'],['pr','Price']],pay:[['party','Party','plist2'],['amt','Amount'],['mode','Mode'],['rem','Remark']]};
+const NUMC=['c','p','pr','amt']; let bk='mail';
+function bInit(){ $('#b_date').valueAsDate=new Date(); bKind('mail'); }
+function bKind(k){ bk=k; document.querySelectorAll('#bseg button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));
+  $('#bh').innerHTML='<tr><th>#</th>'+BC[k].map(c=>`<th>${c[1]}</th>`).join('')+(k==='mail'?'<th class="n">Total</th>':'')+'<th></th></tr>'; $('#bb').innerHTML=''; bAdd(10); }
+function bAdd(n){
+  for(let i=0;i<n;i++){
+    const last=$('#bb').lastElementChild, lp=last?last.querySelector('[data-c=party]').value:'';
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td class="n" style="color:var(--mut)"></td>'+BC[bk].map(c=>c[0]==='mode'?'<td><select class="b-in" data-c="mode"><option>CASH</option><option>BANK</option></select></td>':
+      `<td><input class="b-in" data-c="${c[0]}" ${c[2]?`list="${c[2]}"`:''} ${NUMC.includes(c[0])?'type="number" step="any" inputmode="decimal"':''} oninput="bCalc()" ${c[0]==='party'?`value="${esc(lp)}"`:''}></td>`).join('')+
+      (bk==='mail'?'<td class="tot"></td>':'')+'<td><button class="ic del" onclick="this.closest(\'tr\').remove();bCalc()">×</button></td>';
+    $('#bb').appendChild(tr);
+  }
+  bCalc();
+}
+function bRows(){ return [...$('#bb').children].map(tr=>{ const o={}; tr.querySelectorAll('.b-in').forEach(i=>o[i.dataset.c]=i.value.trim()); return {tr,o}; }); }
+const bFilled=o=>Object.entries(o).some(([k,v])=>v&&k!=='party'&&k!=='mode');
+function bCalc(){
+  let n=0,s=0;
+  bRows().forEach(({tr,o},i)=>{ tr.firstElementChild.textContent=i+1; const f=bFilled(o); if(f) n++;
+    if(bk==='mail'){ const t=(+o.c||0)*(+o.p||0)*(+o.pr||0)*mult; tr.querySelector('.tot').textContent=t?fmt(t):''; if(f) s+=t; } else if(f) s+=+o.amt||0; });
+  $('#bsum').textContent=n+' entries · '+(bk==='mail'?'Total':'Payment')+' \u20B9 '+fmt(s);
+}
+function bPaste(txt,t){
+  const cols=BC[bk].map(c=>c[0]); const ri=[...$('#bb').children].indexOf(t.closest('tr')), ci=cols.indexOf(t.dataset.c);
+  txt.replace(/\r/g,'').split('\n').filter(l=>l.trim()!=='').forEach((line,k)=>{
+    while(ri+k>=$('#bb').children.length) bAdd(1);
+    const tr=$('#bb').children[ri+k];
+    line.split('\t').forEach((v,j)=>{ const c=cols[ci+j]; if(!c) return; const el=tr.querySelector(`[data-c=${c}]`); el.value=NUMC.includes(c)?v.replace(/[^0-9.\-]/g,''):v.trim(); }); });
+  bCalc();
+}
+document.addEventListener('paste',e=>{ const t=e.target; if(!t.classList||!t.classList.contains('b-in')) return; const txt=e.clipboardData.getData('text'); if(!/[\t\n]/.test(txt.trim())) return; e.preventDefault(); bPaste(txt,t); });
+document.addEventListener('keydown',e=>{ if(e.key!=='Enter'||!e.target.classList||!e.target.classList.contains('b-in')) return; e.preventDefault();
+  let all=[...document.querySelectorAll('#bb .b-in')]; const i=all.indexOf(e.target); if(i===all.length-1) bAdd(1);
+  all=[...document.querySelectorAll('#bb .b-in')]; if(all[i+1]) all[i+1].focus(); });
+async function bSave(){
+  const date=$('#b_date').value; if(!date) return say('Date lakho',true);
+  const R=bRows().filter(({o})=>bFilled(o)); if(!R.length) return say('Koi entry bharel nathi',true);
+  document.querySelectorAll('#bb tr').forEach(t=>t.classList.remove('err'));
+  const unk=new Set(), bad=[], rows=[];
+  R.forEach(({tr,o})=>{
+    const pn=pname(o.party); if(!o.party){ bad.push(tr); return; } if(!pn) unk.add(o.party); const party=pn||o.party;
+    if(bk==='mail'){ if(!o.prod){ bad.push(tr); return; } rows.push({date,party,product:o.prod,cartons:+o.c||0,pcs:+o.p||0,price:+o.pr||0}); }
+    else { if(!(+o.amt>0)){ bad.push(tr); return; } rows.push({date,party,amount:+o.amt,mode:o.mode||'CASH',remark:o.rem||''}); } });
+  if(bad.length){ bad.forEach(t=>t.classList.add('err')); return say(bad.length+' row ma party / product / amount khuta che (lal rang)',true); }
+  if(unk.size && !confirm('Aa navi party che: '+[...unk].join(', ')+'\nParty list ma add karvi?')) return;
+  say('Saving '+rows.length+' entries...');
+  try{
+    if(unk.size){ const ps=await call('addMany',{sheet:'Parties',rows:[...unk].map(name=>({name,opening_balance:0}))}); D.parties.push(...ps); }
+    const saved=await call('addMany',{sheet:bk==='mail'?'Mail':'Payments',rows}); D[bk==='mail'?'mail':'pay'].push(...saved);
+    let np=0;
+    if(bk==='mail'){ const m=new Map(); rows.forEach(r=>{ if(!prodSet.has(r.product.toUpperCase())) m.set(r.product.toUpperCase(),r.product); });
+      if(m.size){ try{ const pr=await call('addMany',{sheet:'Products',rows:[...m.values()].map(name=>({name}))}); D.products.push(...pr);
+        m.forEach((v,k)=>prodSet.add(k)); $('#plist').insertAdjacentHTML('beforeend',[...m.values()].map(p=>`<option value="${esc(p)}">`).join('')); np=m.size; }catch(e){} } }
+    refresh(); bKind(bk); say('✓ '+saved.length+' entries save thai'+(np?' · '+np+' navu product add thayu':''));
+  }catch(e){ say('Save na thayu: '+e.message+' (kain save thayu hoy to Entry List ma jovo)',true); }
+}
 async function backup(){ say('Backup banavi rahyo chu...'); try{ const n=await call('backup'); say('✓ Backup bani: '+n+' (Google Drive ma)'); }catch(e){ say(e.message,true); } }
 
+if(DEFAULT_URL) $('#urlrow').classList.add('hide');
 if(API&&KEY){ $('#au').value=API; $('#pw').value=KEY; signIn(); } else { $('#login').classList.remove('hide'); if(API) $('#au').value=API; }
 </script></body></html>
