@@ -76,6 +76,7 @@ tr{break-inside:avoid}thead{display:table-header-group}.kpi b{font-size:15px}#st
 .cg small{text-align:center;color:var(--mut);font-size:11px;margin-top:4px;white-space:nowrap}.cg em{text-align:center;font-style:normal;font-size:10px;color:var(--mut)}
 .lg{display:flex;gap:16px;font-size:12px;color:var(--mut);margin:8px 0 0}.lg s{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;text-decoration:none;vertical-align:middle}
 .th{width:34px;height:34px;object-fit:cover;border-radius:8px;vertical-align:middle;margin-right:8px;background:var(--priL);flex:none}.th0{display:inline-grid;place-items:center;color:var(--mut);font-size:11px;cursor:pointer}.pn2{display:flex;align-items:center}
+th.srt{cursor:pointer;user-select:none}th.srt:hover{filter:brightness(1.3)}th.asc:after{content:' \25B2'}th.desc:after{content:' \25BC'}
 .sh{height:6px;border-radius:4px;background:var(--priL);min-width:60px}.sh i{display:block;height:100%;border-radius:4px;background:var(--pri)}
 .at{min-width:0}.up{color:var(--ok)}.dn{color:var(--red)}h3{margin:0 0 12px;font-size:15px}
 </style></head><body>
@@ -152,8 +153,8 @@ tr{break-inside:avoid}thead{display:table-header-group}.kpi b{font-size:15px}#st
 <label class="chk"><input type="checkbox" id="a_cmp" onchange="drawAna()"> Compare with previous period</label><button class="btn" onclick="window.print()">Print</button></div></div>
 <div class="card kpi" id="a_kpi"></div>
 <div class="card"><h3>Monthly trend</h3><div class="cht" id="a_ch"></div><div class="lg"><span><s style="background:var(--pri)"></s>Purchase</span><span><s style="background:var(--ok)"></s>Payments made</span></div></div>
-<div class="card at"><h3>Products</h3><div class="wrap"><table class="at"><thead><tr><th>Product</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Pieces</th><th class="n">Value</th><th class="n">Avg price / pc</th><th>Share</th></tr></thead><tbody id="a_pt"></tbody></table></div></div>
-<div class="card at"><h3>Parties</h3><div class="wrap"><table class="at"><thead><tr><th>Party</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Purchase</th><th class="n">Avg order</th><th class="n">Payments</th><th>Share</th></tr></thead><tbody id="a_ptb"></tbody></table></div></div>
+<div class="card at"><h3>Products</h3><div class="wrap"><table class="at" id="tp"><thead><tr><th>Product</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Pieces</th><th class="n">Value</th><th class="n">Avg price / pc</th><th>Share</th></tr></thead><tbody id="a_pt"></tbody></table></div></div>
+<div class="card at"><h3>Parties</h3><div class="wrap"><table class="at" id="tq"><thead><tr><th>Party</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Purchase</th><th class="n">Avg order</th><th class="n">Payments</th><th>Share</th></tr></thead><tbody id="a_ptb"></tbody></table></div></div>
 </div>
 <datalist id="plist"></datalist><datalist id="plist2"></datalist>
 </main></section>
@@ -232,12 +233,19 @@ async function start(){
 }
 function refresh(){ imgs={}; D.products.forEach(p=>{ if(p.image) imgs[String(p.name).trim().toUpperCase()]=p.image; }); parties=calc(D,mult); $('#plist2').innerHTML=parties.map(p=>`<option value="${esc(p.party_name)}">`).join(''); }
 
+const sS={k:'party_name',dir:1}, lS={k:'',dir:1}, lG={k:'',dir:1}, aP={k:'',dir:-1}, aQ={k:'',dir:-1};
+const cmpv=(a,b,k)=>typeof a[k]==='string'||typeof b[k]==='string'?String(a[k]||'').localeCompare(String(b[k]||'')):(a[k]||0)-(b[k]||0);
+function sortable(sel,map,st,redraw){ const ths=document.querySelectorAll(sel+' thead tr:first-child th');
+  const mk=()=>ths.forEach((th,i)=>{ th.classList.toggle('asc',map[i]===st.k&&st.dir>0); th.classList.toggle('desc',map[i]===st.k&&st.dir<0); });
+  ths.forEach((th,i)=>{ const k=map[i]; if(!k) return; th.classList.add('srt'); th.title='Click to sort';
+    th.onclick=()=>{ st.dir=st.k===k?-st.dir:(/name|party|remark|^n$/.test(k)?1:-1); st.k=k; mk(); redraw(); }; }); mk(); }
 function drawSummary(){
   const S=k=>parties.reduce((a,p)=>a+Number(p[k]||0),0);
   $('#s1').textContent='\u20B9 '+fmt(S('final_pending')); $('#s2').textContent='\u20B9 '+fmt(S('main_purchase')+S('extra_charges'));
   $('#s3').textContent='\u20B9 '+fmt(S('cash_payment')); $('#s5').textContent='\u20B9 '+fmt(S('bank_payment')); $('#s4').textContent=parties.length;
   const q=$('#sq').value.trim().toLowerCase(), onlyP=$('#sp').checked;
   const L=parties.filter(p=>p.party_name.toLowerCase().includes(q)&&(!onlyP||Math.abs(p.final_pending)>0.005));
+  if(sS.k) L.sort((a,b)=>sS.dir*cmpv(a,b,sS.k));
   const T=k=>L.reduce((a,p)=>a+Number(p[k]||0),0);
   const row=(n,o,m,e,c,b,f,tot)=>`<td>${tot?'TOTAL ('+L.length+')':`<span class="av">${esc(n).charAt(0).toUpperCase()}</span><a class="pn" onclick="openLedger(this.dataset.n)" data-n="${esc(n)}">${esc(n)}</a>`}</td><td class="n">${fmt(o)}</td><td class="n">${fmt(m)}</td><td class="n">${fmt(e)}</td><td class="n">${fmt(c)}</td><td class="n">${fmt(b)}</td><td class="n ${f<0?'neg':''}"><b>${fmt(f)}</b></td>`;
   $('#stot').innerHTML=row('',T('opening_balance'),T('main_purchase'),T('extra_charges'),T('cash_payment'),T('bank_payment'),T('final_pending'),1);
@@ -254,6 +262,7 @@ function loadLedger(){
   const lm=[...rows].reverse().find(r=>r.m);
   if(lm){ $('#k3').textContent=fd(lm.date); $('#k4').textContent='Pending at that time: '+fmt(lm.pending)+' · '+(rows.length-1-rows.lastIndexOf(lm))+' entries since'; }
   else { $('#k3').textContent='-'; $('#k4').textContent='No entry marked yet'; }
+  rows.forEach(r=>{ r.cash=r.mode==='CASH'?r.payment:0; r.bank=r.mode==='BANK'?r.payment:0; }); if(lG.k) rows.sort((a,b)=>lG.dir*cmpv(a,b,lG.k));
   $('#lb').innerHTML=rows.map(r=>{
     const act=`<button class="ic ${r.m?'ok':''}" title="Match mark" onclick="mark('${r.kind}','${r.id}',${!!r.m})">✓</button><button class="ic" title="Edit entry" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic" title="Note" data-n="${esc(r.note)}" onclick="editNote('${r.kind}','${r.id}',this)">💬</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button>`;
     return `<tr class="${r.kind} ${r.m?'m':''}"><td>${fd(r.date)}</td><td>${esc(name)}</td>
@@ -379,6 +388,7 @@ function drawList(){
     return (!f||d>=f)&&(!t||d<=t)&&(!k||r.kind===k)&&(!pn||r.party.toLowerCase().includes(pn)); });
   L.sort((a,b)=>by==='created'?((b.c>a.c?1:b.c<a.c?-1:0)||(b.date>a.date?1:b.date<a.date?-1:0)||b.seq-a.seq):((b.date>a.date?1:b.date<a.date?-1:0)||(b.c>a.c?1:b.c<a.c?-1:0)||b.seq-a.seq));
   $('#lk1').textContent=L.length; $('#lk2').textContent='\u20B9 '+fmt(L.filter(r=>r.kind!=='PAYMENT').reduce((a,r)=>a+r.amt,0)); $('#lk3').textContent='\u20B9 '+fmt(L.filter(r=>r.kind==='PAYMENT').reduce((a,r)=>a+r.amt,0));
+  if(lS.k) L.sort((a,b)=>lS.dir*cmpv(a,b,lS.k));
   const sig=[by,f,t,pn,k].join('|'); if(sig!==lastSig){ lastSig=sig; listLim=1000; } const shown=L.slice(0,listLim);
   $('#ll').innerHTML=shown.map(r=>`<tr class="${r.kind}"><td>${fd(r.date)}</td><td><b>${esc(r.party)}</b></td>
    <td>${r.kind==='PAYMENT'?`<span class="ch p">${esc(r.mode||'Payment')}</span>`:r.kind==='EXTRA'?'<span class="ch e">Extra</span>':thumb(r.remark)}${esc(r.remark)}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
@@ -486,10 +496,10 @@ function drawAna(){
    +(pr?'':K('Payments made','₹ '+fmt(pay),dl(pay,B&&(B.cash+B.bank))+'<i>Cash '+fmt(A.cash)+' ('+(pay?Math.round(A.cash/pay*100):0)+'%) · Bank '+fmt(A.bank)+'</i>'));
   const ms=Object.keys(A.month).sort().slice(-24), mx=Math.max(1,...ms.map(m=>Math.max(A.month[m].p,A.month[m].r)));
   $('#a_ch').innerHTML=ms.map(m=>{ const o=A.month[m]; return `<div class="cg" title="${MN[+m.slice(5)-1]} ${m.slice(0,4)}: Purchase ${fmt(o.p)} | Payments ${fmt(o.r)}"><em>${cmp(o.p)}</em><div class="cb"><i style="height:${o.p/mx*100}%;background:var(--pri)"></i><i style="height:${o.r/mx*100}%;background:var(--ok)"></i></div><small>${MN[+m.slice(5)-1]} '${m.slice(2,4)}</small></div>`; }).join('')||'<div style="color:var(--mut)">No data for this filter.</div>';
-  const top=(o)=>Object.values(o).sort((a,b)=>b[sk]-a[sk]).slice(0,100);
+  const top=(o,st,isP)=>Object.values(o).map(p=>({...p,avg:isP?(p.pcs?p.val/p.pcs:0):(p.ord?p.val/p.ord:0)})).sort((a,b)=>st.k?st.dir*cmpv(a,b,st.k):b[sk]-a[sk]).slice(0,100);
   const sh=(x,tot)=>`<td><div class="sh"><i style="width:${tot?x/tot*100:0}%"></i></div><small style="color:var(--mut)">${tot?(x/tot*100).toFixed(1):0}%</small></td>`;
-  $('#a_pt').innerHTML=top(A.prod).map(p=>`<tr><td><div class="pn2">${thumb(p.n,1)}<b>${esc(p.n)}</b></div></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n">${p.pcs.toLocaleString('en-IN')}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.pcs?p.val/p.pcs:0)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
-  $('#a_ptb').innerHTML=top(A.party).map(p=>`<tr><td><b>${esc(p.n)}</b></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.ord?p.val/p.ord:0)}</td><td class="n">${fmt(p.pay)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
+  $('#a_pt').innerHTML=top(A.prod,aP,1).map(p=>`<tr><td><div class="pn2">${thumb(p.n,1)}<b>${esc(p.n)}</b></div></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n">${p.pcs.toLocaleString('en-IN')}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.pcs?p.val/p.pcs:0)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
+  $('#a_ptb').innerHTML=top(A.party,aQ,0).map(p=>`<tr><td><b>${esc(p.n)}</b></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.ord?p.val/p.ord:0)}</td><td class="n">${fmt(p.pay)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
   say(pr?'Payments are not shown when a product filter is set.':($('#a_cmp').checked&&!(f&&t)?'Select both From and To dates to compare with the previous period.':''));
 }
 async function saveImgs(items){
@@ -503,6 +513,11 @@ async function importImgs(){
   try{ let n=0; for(let i=0;i<items.length;i+=300) n+=await saveImgs(items.slice(i,i+300)); say('\u2713 '+n+' of '+items.length+' images matched to Product Master'); redraw(); }catch(e){ say(e.message,true); } }
 async function backup(){ say('Creating backup...'); try{ const n=await call('backup'); say('✓ Backup created: '+n+' (in Google Drive)'); }catch(e){ say(e.message,true); } }
 
+sortable('#sum',['party_name','opening_balance','main_purchase','extra_charges','cash_payment','bank_payment','final_pending'],sS,drawSummary);
+sortable('#lst',['date','party','remark','','price','amt','c'],lS,drawList);
+sortable('#led',['date','','remark','cartons','pcs','price','total','cash','bank','pending',''],lG,loadLedger);
+sortable('#tp',['n','ord','ctn','pcs','val','avg','val'],aP,drawAna);
+sortable('#tq',['n','ord','ctn','val','avg','pay','val'],aQ,drawAna);
 if(DEFAULT_URL) $('#urlrow').classList.add('hide');
 if(API&&KEY){ $('#au').value=API; $('#pw').value=KEY; signIn(); } else { $('#login').classList.remove('hide'); if(API) $('#au').value=API; }
 </script></body></html>
