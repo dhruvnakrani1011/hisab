@@ -184,14 +184,14 @@ async function signIn(){
   try{ await start(); localStorage.setItem('gs_url',API); localStorage.setItem('gs_key',KEY); }
   catch(e){ $('#lerr').textContent=e.message; $('#login').classList.remove('hide'); $('#app').classList.add('hide'); }
 }
-function logout(){ localStorage.removeItem('gs_key'); location.reload(); }
+function logout(){ localStorage.removeItem('gs_key'); localStorage.removeItem('gs_url'); location.reload(); }
 function tab(t){ document.querySelectorAll('.tab').forEach(e=>e.classList.add('hide')); $('#'+t).classList.remove('hide');
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); say(''); }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; tab(t);
   if(t==='sum') drawSummary(); if(t==='lst'){ if(!$('#lf_from').value) listRange(0); else drawList(); } if(t==='blk'&&!$('#bb').children.length) bInit(); });
 
 async function start(){
-  D=await call('getAll'); mult=D.mult||4; refresh();
+  D=await call('getAll'); mult=D.mult||4; refresh(); $('#who').textContent='Owner · '+((API.match(/\/s\/([^/]+)/)||[])[1]||'').slice(0,8)+'…';
   $('#login').classList.add('hide'); $('#app').classList.remove('hide');
   prodSet=new Set(D.products.map(p=>String(p.name).toUpperCase()));
   $('#plist').innerHTML=D.products.map(p=>`<option value="${esc(p.name)}">`).join('');
