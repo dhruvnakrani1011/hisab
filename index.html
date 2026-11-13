@@ -116,7 +116,7 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);co
 <div><label>From</label><input type="date" id="lf_from" onchange="drawList()"></div><div><label>To</label><input type="date" id="lf_to" onchange="drawList()"></div>
 <div><label>Party</label><input id="lf_party" list="plist2" placeholder="badha" oninput="drawList()"></div>
 <div><label>Type</label><select id="lf_kind" onchange="drawList()"><option value="">Badha</option><option value="MAIL">Mail</option><option value="PAYMENT">Payment</option><option value="EXTRA">Extra</option></select></div>
-<button class="btn" onclick="listRange(0)">Aaj</button><button class="btn" onclick="listRange(1)">Kal</button><button class="btn" onclick="listRange(7)">7 divas</button><button class="btn" onclick="window.print()">Print</button></div>
+<button class="btn" onclick="listRange(0)">Aaj</button><button class="btn" onclick="listRange(1)">Kal</button><button class="btn" onclick="listRange(7)">7 divas</button><button class="btn" onclick="listRange(-1)">Badhu (juni pan)</button><button class="btn" onclick="window.print()">Print</button></div>
 <div class="card kpi"><div><small>Entries</small><b id="lk1">-</b></div><div><small>Purchase + Extra</small><b id="lk2">-</b></div><div><small>Payment</small><b id="lk3">-</b></div></div>
 <div class="card wrap"><table><thead><tr><th>Date</th><th>Party</th><th>Details</th><th class="n">Cartoon x Pcs</th><th class="n">Price</th><th class="n">Amount</th><th>Entry kari</th><th class="noprint"></th></tr></thead><tbody id="ll"></tbody></table></div></div>
 <datalist id="plist"></datalist><datalist id="plist2"></datalist>
@@ -147,7 +147,7 @@ function ledgerRows(D,mult,name,opening){
   let p=opening; o.forEach(r=>{p+=r.total-r.payment; r.pending=p;}); return o;
 }
 //CALC-END
-const DEFAULT_URL="https://script.google.com/macros/s/AKfycbxyBoPXXUHejUliy5ibTbV8iH_Wm_WrBi1OuFgxHlhrsnmIsvmImyUoV3o-csVAlH5_/exec"; // optional: ahi Web App URL paste karo to kyarey puchse nahi
+const DEFAULT_URL=""; // optional: ahi Web App URL paste karo to kyarey puchse nahi
 let API=localStorage.getItem('gs_url')||DEFAULT_URL, KEY=localStorage.getItem('gs_key')||'';
 let D={parties:[],products:[],mail:[],pay:[],ext:[],mult:4}, parties=[], mult=4, ed=null, prodSet=new Set();
 const SHEET={MAIL:'Mail',PAYMENT:'Payments',EXTRA:'Extra'}, LIST={MAIL:'mail',PAYMENT:'pay',EXTRA:'ext'};
@@ -284,7 +284,7 @@ async function saveEntry(){
 // ---------- Entry List ----------
 const today=()=>nowIso().slice(0,10);
 const addDays=(s,n)=>{ const d=new Date(s+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
-function listRange(n){ const t=today(); $('#lf_from').value=n===7?addDays(t,-6):n===1?addDays(t,-1):t; $('#lf_to').value=n===1?addDays(t,-1):t; drawList(); }
+function listRange(n){ const t=today(); if(n===-1){ $('#lf_by').value='date'; $('#lf_from').value=''; $('#lf_to').value=''; return drawList(); } $('#lf_from').value=n===7?addDays(t,-6):n===1?addDays(t,-1):t; $('#lf_to').value=n===1?addDays(t,-1):t; drawList(); }
 function allEntries(){
   const o=[], m=mult;
   D.mail.filter(live).forEach(r=>o.push({kind:'MAIL',id:r.id,date:r.date,party:r.party,remark:r.product,qty:num(r.cartons)+' x '+num(r.pcs),price:num(r.price)*m,amt:num(r.cartons)*num(r.pcs)*num(r.price)*m,mode:'',c:r.created_at||'',seq:r._r,note:r.note}));
@@ -303,7 +303,7 @@ function drawList(){
    <td>${r.kind==='PAYMENT'?`<span class="ch p">${esc(r.mode||'Payment')}</span>`:r.kind==='EXTRA'?'<span class="ch e">Extra</span>':''}${esc(r.remark)}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
    <td class="n">${esc(r.qty)}</td><td class="n">${r.price?fmt(r.price):''}</td><td class="n"><b>${fmt(r.amt)}</b></td>
    <td>${r.c?fd(r.c)+' '+r.c.slice(11,16):'-'}</td>
-   <td class="noprint n"><button class="ic" title="Edit" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button></td></tr>`).join('')||'<tr><td colspan="8" style="padding:20px;color:var(--mut)">Koi entry nathi. "Entry ni date thi" try karo ke date badlo.</td></tr>';
+   <td class="noprint n"><button class="ic" title="Edit" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button></td></tr>`).join('')||'<tr><td colspan="8" style="padding:20px;color:var(--mut)">Koi entry nathi. Juni entries mate upar <b>"Badhu (juni pan)"</b> dabavo.</td></tr>';
   say(L.length>500?'Pehli 500 entries dekhay che. Date/party thi filter karo.':'');
 }
 
