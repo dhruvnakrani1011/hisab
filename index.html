@@ -81,6 +81,7 @@ th.srt{cursor:pointer;user-select:none}th.srt:hover{filter:brightness(1.3)}th.sr
 .stat{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:10px}.stat .si{position:static;grid-column:2;grid-row:1;width:32px;height:32px}.stat small{grid-column:1;grid-row:1}.stat b{grid-column:1/-1;grid-row:2;font-size:clamp(18px,1.8vw,24px);white-space:nowrap}
 .sh{height:6px;border-radius:4px;background:var(--priL);min-width:60px}.sh i{display:block;height:100%;border-radius:4px;background:var(--pri)}
 .at{min-width:0}.up{color:var(--ok)}.dn{color:var(--red)}h3{margin:0 0 12px;font-size:15px}
+input.mc{width:20px;height:20px;margin:0 8px 0 0;vertical-align:middle;accent-color:var(--ok);cursor:pointer;padding:0}tr.m td{background:var(--pay)}
 </style></head><body>
 
 <section id="login" class="hide"><main><div class="card">
@@ -107,7 +108,8 @@ th.srt{cursor:pointer;user-select:none}th.srt:hover{filter:brightness(1.3)}th.sr
 
 <div id="led" class="tab hide">
 <div class="card bar noprint"><div><label>Party</label><input id="lp" list="plist2" placeholder="Type or select party" onchange="loadLedger()"></div>
-<button class="btn" onclick="stPrint()">Print</button><button class="btn" onclick="stDownload()">Download PDF</button><button class="btn" title="Statement details (business name, entries)" onclick="stOpen()">&#9881;</button></div>
+<button class="btn" onclick="stPrint()">Print</button><button class="btn" onclick="stDownload()">Download PDF</button><button class="btn" title="Statement details (business name, entries)" onclick="stOpen()">&#9881;</button><button class="btn" id="mmb" onclick="mmToggle()">&#10003; Match mode</button></div>
+<div class="card noprint hide" id="mprog"><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><b id="mpt"></b><div class="sh" style="flex:1;min-width:120px"><i id="mpb" style="width:0"></i></div><select id="mf" onchange="loadLedger()" style="width:auto"><option value="all">Show all</option><option value="open">Not matched only</option><option value="done">Matched only</option></select><button class="btn" onclick="mAll(1)">Tick all shown</button><button class="btn" onclick="mAll(0)">Untick all shown</button></div><div style="font-size:12px;color:var(--mut);margin-top:6px">Tick each entry as you check it against the party's statement. Compare the <b>Pending</b> column with the party's balance at that line. Saves instantly.</div></div>
 <div class="card kpi"><div><small>Party</small><b id="k0">-</b></div><div><small>Opening Balance</small><b id="k1">-</b></div>
 <div><small>Final Pending</small><b id="k2">-</b></div><div><small>Last Matched</small><b id="k3">-</b><i id="k4"></i></div></div>
 <div class="card wrap"><table><thead><tr><th>Date</th><th>Party Name</th><th>Product Name</th><th class="n">Cartons</th><th class="n">Pcs / Carton</th><th class="n">Original Price</th><th class="n">Original Total</th><th class="n">Cash Payment</th><th class="n">Bank Payment</th><th class="n">Pending</th><th class="noprint act"></th></tr></thead><tbody id="lb"></tbody></table></div></div>
@@ -265,18 +267,21 @@ function drawSummary(){
 }
 function openLedger(name){ $('#lp').value=name; tab('led'); loadLedger(); }
 
+var mm=false, mQ=Promise.resolve();
 function loadLedger(){
   const name=pname($('#lp').value); if(!name){ $('#lb').innerHTML=''; return say($('#lp').value?'No such party':'',true); }
-  const p=parties.find(x=>x.party_name===name), rows=ledgerRows(D,mult,name,p.opening_balance);
+  const p=parties.find(x=>x.party_name===name); let rows=ledgerRows(D,mult,name,p.opening_balance);
   $('#k0').textContent=name; $('#k1').textContent=fmt(p.opening_balance);
   $('#k2').textContent=fmt(p.final_pending); $('#k2').className=p.final_pending<0?'neg':'';
   const lm=[...rows].reverse().find(r=>r.m);
   if(lm){ $('#k3').textContent=fd(lm.date); $('#k4').textContent='Pending at that time: '+fmt(lm.pending)+' · '+(rows.length-1-rows.lastIndexOf(lm))+' entries since'; }
   else { $('#k3').textContent='-'; $('#k4').textContent='No entry marked yet'; }
   rows.forEach(r=>{ r.cash=r.mode==='CASH'?r.payment:0; r.bank=r.mode==='BANK'?r.payment:0; }); if(lG.k) rows.sort((a,b)=>lG.dir*cmpv(a,b,lG.k));
+  const nAll=rows.length, nDone=rows.filter(r=>r.m).length; $('#mmb').classList.toggle('pri',mm); $('#mprog').classList.toggle('hide',!mm);
+  if(mm){ $('#mpt').textContent='Matched '+nDone+' of '+nAll+'  |  Not matched '+(nAll-nDone); $('#mpb').style.width=(nAll?nDone/nAll*100:0)+'%'; const f=$('#mf').value; if(f==='open') rows=rows.filter(r=>!r.m); else if(f==='done') rows=rows.filter(r=>r.m); }
   $('#lb').innerHTML=rows.map(r=>{
     const act=`<button class="ic ${r.m?'ok':''}" title="Match mark" onclick="mark('${r.kind}','${r.id}',${!!r.m})">✓</button><button class="ic" title="Edit entry" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic" title="Note" data-n="${esc(r.note)}" onclick="editNote('${r.kind}','${r.id}',this)">💬</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button>`;
-    return `<tr class="${r.kind} ${r.m?'m':''}"><td>${fd(r.date)}</td><td>${esc(name)}</td>
+    return `<tr class="${r.kind} ${r.m?'m':''}"><td>${mm?`<input type="checkbox" class="mc" ${r.m?'checked':''} onchange="mTick('${r.kind}','${r.id}',this)">`:''}${fd(r.date)}</td><td>${esc(name)}</td>
     <td>${r.kind==='PAYMENT'?'<span class="ch p">Payment</span>':r.kind==='EXTRA'?'<span class="ch e">Extra</span>':thumb(r.remark)}${esc(r.remark)}${r.m?`<span class="tag">✓ Matched ${fd(r.m)}</span>`:''}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
     <td class="n">${r.cartons}</td><td class="n">${r.pcs}</td><td class="n">${fmt(r.price)}</td><td class="n">${fmt(r.total)}</td>
     <td class="n">${fmt(r.mode==='CASH'?r.payment:0)}</td><td class="n">${fmt(r.mode==='BANK'?r.payment:0)}</td>
@@ -288,6 +293,12 @@ async function upd(kind,id,patch){
   catch(e){ say(e.message,true); return false; }
 }
 function redraw(){ drawSummary(); if(!$('#lst').classList.contains('hide')) drawList(); }
+function mmToggle(){ mm=!mm; loadLedger(); }
+function mTick(kind,id,cb){ const on=cb.checked, L=D[LIST[kind]], i=L.findIndex(x=>x.id===id); if(i<0) return; const old=L[i].matched_at, val=on?nowIso():'';
+  L[i]={...L[i],matched_at:val}; cb.closest('tr').classList.toggle('m',on);
+  mQ=mQ.then(()=>call('update',{sheet:SHEET[kind],id,patch:{matched_at:val}})).then(row=>{ queueSync([L[i].party]); }).catch(e=>{ L[i]={...L[i],matched_at:old}; cb.checked=!on; cb.closest('tr').classList.toggle('m',!on); say(e.message,true); });
+  const t=$('#lb').querySelectorAll('input.mc'); let n=0; t.forEach(x=>{ if(x.checked) n++; }); if($('#mf').value==='all'){ $('#mpt').textContent='Matched '+n+' of '+t.length+'  |  Not matched '+(t.length-n); $('#mpb').style.width=(t.length?n/t.length*100:0)+'%'; } }
+async function mAll(on){ const boxes=[...$('#lb').querySelectorAll('input.mc')].filter(b=>b.checked!==!!on); if(!boxes.length) return; if(!confirm((on?'Tick ':'Untick ')+boxes.length+' entries?')) return; boxes.forEach(b=>{ b.checked=!!on; b.dispatchEvent(new Event('change')); }); setTimeout(loadLedger,300); }
 async function mark(kind,id,on){ if(await upd(kind,id,{matched_at:on?'':nowIso()})) loadLedger(); }
 async function editNote(kind,id,el){ const t=prompt('Note (leave blank to remove):',el.dataset.n||''); if(t===null) return;
   if(await upd(kind,id,{note:t.trim()})) loadLedger(); }
