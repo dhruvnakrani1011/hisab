@@ -281,7 +281,7 @@ function loadLedger(){
   if(mm){ $('#mpt').textContent='Matched '+nDone+' of '+nAll+'  |  Not matched '+(nAll-nDone); $('#mpb').style.width=(nAll?nDone/nAll*100:0)+'%'; const f=$('#mf').value; if(f==='open') rows=rows.filter(r=>!r.m); else if(f==='done') rows=rows.filter(r=>r.m); }
   $('#lb').innerHTML=rows.map(r=>{
     const act=`<button class="ic ${r.m?'ok':''}" title="Match mark" onclick="mark('${r.kind}','${r.id}',${!!r.m})">✓</button><button class="ic" title="Edit entry" onclick="editRow('${r.kind}','${r.id}')">✎</button><button class="ic" title="Note" data-n="${esc(r.note)}" onclick="editNote('${r.kind}','${r.id}',this)">💬</button><button class="ic del" title="Delete" onclick="del('${r.kind}','${r.id}')">×</button>`;
-    return `<tr class="${r.kind} ${r.m?'m':''}"><td>${mm?`<input type="checkbox" class="mc" ${r.m?'checked':''} onchange="mTick('${r.kind}','${r.id}',this)">`:''}${fd(r.date)}</td><td>${esc(name)}</td>
+    return `<tr class="${r.kind} ${r.m?'m':''}"><td style="white-space:nowrap">${mm?`<input type="checkbox" class="mc" ${r.m?'checked':''} onchange="mTick('${r.kind}','${r.id}',this)">`:''}${fd(r.date)}</td><td>${esc(name)}</td>
     <td>${r.kind==='PAYMENT'?'<span class="ch p">Payment</span>':r.kind==='EXTRA'?'<span class="ch e">Extra</span>':thumb(r.remark)}${esc(r.remark)}${r.m?`<span class="tag">✓ Matched ${fd(r.m)}</span>`:''}${r.note?`<span class="note">${esc(r.note)}</span>`:''}</td>
     <td class="n">${r.cartons}</td><td class="n">${r.pcs}</td><td class="n">${fmt(r.price)}</td><td class="n">${fmt(r.total)}</td>
     <td class="n">${fmt(r.mode==='CASH'?r.payment:0)}</td><td class="n">${fmt(r.mode==='BANK'?r.payment:0)}</td>
@@ -579,9 +579,9 @@ async function waPdf(d){
   const T=(t,x,yy,o={})=>pg.drawText(san(t),{x,y:yy,size:o.s||9,font:o.f||(o.b?B:F),color:o.c||INK});
   const RT=(t,xr,yy,o={})=>{ t=san(t); const f=o.f||(o.b?B:F); pg.drawText(t,{x:xr-f.widthOfTextAtSize(t,o.s||9),y:yy,size:o.s||9,font:f,color:o.c||INK}); };
   const cut=(t,w,s)=>{ t=san(t); while(t.length>1&&F.widthOfTextAtSize(t,s)>w) t=t.slice(0,-1); return t; };
-  const X={date:M+8,part:M+60,ctn:268,cpc:334,sales:410,recv:476,bal:R-8};
+  const X={date:M+8,part:M+60,ctn:256,cpc:318,sales:384,recv:448,bal:510,mt:R-14};
   const thead=()=>{ pg.drawRectangle({x:M,y:y-6,width:R-M,height:20,color:NAVY}); const o={b:1,s:7.5,c:WHITE};
-    T('DATE',X.date,y,o); T('PRODUCT NAME',X.part,y,o); RT('CARTOON',X.ctn,y,o); RT('CARTOON PCS',X.cpc,y,o); RT('TOTAL',X.sales,y,o); RT('PAID',X.recv,y,o); RT('BALANCE',X.bal,y,o); y-=24; };
+    T('DATE',X.date,y,o); T('PRODUCT NAME',X.part,y,o); RT('CARTOON',X.ctn,y,o); RT('CARTOON PCS',X.cpc,y,o); RT('TOTAL',X.sales,y,o); RT('PAID',X.recv,y,o); RT('BALANCE',X.bal,y,o); RT('MATCH',X.mt+5,y,o); y-=24; };
   const newPage=first=>{ pg=doc.addPage([W,H]); pages.push(pg);
     if(first){ pg.drawRectangle({x:0,y:H-78,width:W,height:78,color:NAVY}); pg.drawRectangle({x:0,y:H-82,width:W,height:4,color:ACC});
       T(biz,M,H-38,{b:1,s:20,c:WHITE}); if(cline) T(cline,M,H-58,{s:9,c:rgb(.8,.84,.96)});
@@ -598,13 +598,14 @@ async function waPdf(d){
   if(d.L.length<d.rows.length||d.p.opening_balance){ T('Balance brought forward',X.part,y,{f:I,s:8.5,c:MUT}); RT(money(d.prev),X.bal,y,{c:MUT}); line(); y-=rowH; }
   d.L.forEach((r,i)=>{ if(y<M+70){ newPage(false); thead(); }
     if(i%2===0) pg.drawRectangle({x:M,y:y-5,width:R-M,height:rowH,color:rgb(.975,.98,.995)});
-    const isP=r.kind==='PAYMENT', det=isP?'Payment made - '+(r.mode==='BANK'?'Bank':'Cash')+(r.remark?' ('+r.remark+')':''):r.kind==='EXTRA'?(r.remark||'Extra charge'):r.remark;
-    T(fd(r.date),X.date,y,{s:8.5}); T(cut(det,X.ctn-X.part-34,8.5),X.part,y,{s:8.5,c:isP?GRN:INK});
+    const isP=r.kind==='PAYMENT', det=isP?'Payment made - '+(r.mode==='BANK'?'Bank':'Cash')+(r.remark&&r.remark.trim().toLowerCase()!==(r.mode==='BANK'?'bank':'cash')?' ('+r.remark+')':''):r.kind==='EXTRA'?(r.remark||'Extra charge'):r.remark;
+    T(fd(r.date),X.date,y,{s:8.5}); T(cut(det,(isP?X.sales-X.part-70:X.ctn-X.part-34),8.5),X.part,y,{s:8.5,c:isP?GRN:INK});
     if(r.kind==='MAIL'){ RT(String(r.cartons),X.ctn,y,{s:8.5,c:MUT}); RT(String(r.pcs),X.cpc,y,{s:8.5,c:MUT}); }
-    if(r.total) RT(fmt(r.total),X.sales,y,{s:8.5}); if(r.payment) RT(fmt(r.payment),X.recv,y,{s:8.5,c:GRN,b:1}); RT(money(r.pending),X.bal,y,{s:8.5,b:1,c:r.pending<-0.005?GRN:INK}); line(); y-=rowH; });
+    if(r.total) RT(fmt(r.total),X.sales,y,{s:8.5}); if(r.payment) RT(fmt(r.payment),X.recv,y,{s:8.5,c:GRN,b:1}); RT(money(r.pending),X.bal,y,{s:8.5,b:1,c:r.pending<-0.005?GRN:INK}); if(r.m) pg.drawCircle({x:X.mt,y:y+3,size:3.6,color:GRN}); else pg.drawCircle({x:X.mt,y:y+3,size:3.4,borderColor:rgb(.6,.64,.72),borderWidth:.8}); line(); y-=rowH; });
   if(y<M+110){ newPage(false); }
   y-=6; pg.drawRectangle({x:M,y:y-8,width:R-M,height:22,color:rgb(.93,.94,1)}); T('TOTAL',X.part,y,{b:1,s:9}); RT(fmt(sales),X.sales,y,{b:1,s:9}); RT(fmt(recv),X.recv,y,{b:1,s:9,c:GRN}); RT(money(f),X.bal,y,{b:1,s:9,c:f<-0.005?GRN:RED}); y-=14; if(d.prev<-0.005||d.L.some(r=>r.pending<-0.005)||f<-0.005){ T('Amounts in ( ) are advance paid by us.',M,y,{f:I,s:7.5,c:MUT}); } y-=30;
   pg.drawRectangle({x:M,y:y-34,width:R-M,height:46,color:f<-0.005?rgb(.9,.97,.92):rgb(1,.93,.94),borderColor:f<-0.005?GRN:RED,borderWidth:.8});
+  const nm=d.L.filter(r=>r.m).length; RT('Matched: '+nm+' of '+d.L.length+' entries',R-14,y-14,{b:1,s:9,c:GRN}); RT('Not matched: '+(d.L.length-nm),R-14,y-28,{s:9,c:MUT});
   T(f<-0.005?'CLOSING BALANCE - ADVANCE PAID BY US':'CLOSING BALANCE - PAYABLE TO YOU',M+14,y-8,{b:1,s:8,c:MUT}); T('Rs. '+fmt(Math.abs(f)),M+14,y-28,{b:1,s:17,c:f<-0.005?GRN:RED});
   pages.forEach((p,i)=>{ p.drawLine({start:{x:M,y:44},end:{x:R,y:44},thickness:.5,color:LN}); p.drawText('This is a computer generated statement.'+(cline?'  '+san(cline):''),{x:M,y:30,size:7.5,font:F,color:MUT});
     const pt='Page '+(i+1)+' of '+pages.length; p.drawText(pt,{x:R-F.widthOfTextAtSize(pt,7.5),y:30,size:7.5,font:F,color:MUT}); });
