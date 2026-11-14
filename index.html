@@ -2,6 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Party Hisab</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <style>
 :root{--bg:#f4f6fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e8ecf3;--pri:#4f46e5;--priL:#eef0ff;--mail:#f3f7ff;--pay:#effaf3;--ext:#fff8e6;--ok:#16a34a;--red:#e11d48;--side:#0f172a;--sh:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06)}
 @media(prefers-color-scheme:dark){:root{--bg:#0b1020;--card:#131a2b;--ink:#e8ecf6;--mut:#94a3b8;--line:#222c42;--pri:#818cf8;--priL:#232b52;--mail:#16233d;--pay:#12281d;--ext:#2f2a14;--ok:#4ade80;--red:#fb7185;--side:#0a0f1d;color-scheme:dark}}
@@ -65,7 +66,7 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);co
 #login{min-height:100vh;display:grid;place-items:center;background:radial-gradient(900px 500px at 15% 0,#c7d2fe 0,transparent 60%),radial-gradient(800px 500px at 100% 100%,#ddd6fe 0,transparent 60%),var(--bg)}
 #login main{margin:0;padding:16px;width:min(400px,100%)}#login .logo{color:var(--ink);padding:0 0 14px}
 @media(max-width:900px){header{position:sticky;inset:auto;top:0;width:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:10px 12px}.logo{padding:0}nav{flex-direction:row;overflow:auto;flex:1 1 100%;order:3}main{margin-left:0;padding:14px}}
-@media print{@page{size:A4 landscape;margin:8mm}
+@media print{th.srt:after{content:none!important}@page{size:A4 landscape;margin:8mm}
 :root{--bg:#fff;--card:#fff;--ink:#000;--mut:#444;--line:#cbd5e1;--mail:#f3f7ff;--pay:#effaf3;--ext:#fff8e6;--priL:#eef0ff;--pri:#3730a3;--ok:#15803d;--red:#be123c}
 header,.noprint,#msg,.stats,.act{display:none!important}body{background:#fff;color:#000}main{margin:0!important;padding:0!important}
 .card{box-shadow:none;border:0;padding:0 0 8px;margin-bottom:8px;break-inside:avoid}.wrap,.card.wrap{max-height:none!important;overflow:visible!important;min-height:0!important}
@@ -106,7 +107,7 @@ th.srt{cursor:pointer;user-select:none}th.srt:hover{filter:brightness(1.3)}th.sr
 
 <div id="led" class="tab hide">
 <div class="card bar noprint"><div><label>Party</label><input id="lp" list="plist2" placeholder="Type or select party" onchange="loadLedger()"></div>
-<button class="btn" onclick="window.print()">Print / PDF</button></div>
+<button class="btn" onclick="stPrint()">Print</button><button class="btn" onclick="stDownload()">Download PDF</button><button class="btn" title="Statement details (business name, entries)" onclick="stOpen()">&#9881;</button></div>
 <div class="card kpi"><div><small>Party</small><b id="k0">-</b></div><div><small>Opening Balance</small><b id="k1">-</b></div>
 <div><small>Final Pending</small><b id="k2">-</b></div><div><small>Last Matched</small><b id="k3">-</b><i id="k4"></i></div></div>
 <div class="card wrap"><table><thead><tr><th>Date</th><th>Party Name</th><th>Product Name</th><th class="n">Cartons</th><th class="n">Pcs / Carton</th><th class="n">Original Price</th><th class="n">Original Total</th><th class="n">Cash Payment</th><th class="n">Bank Payment</th><th class="n">Pending</th><th class="noprint act"></th></tr></thead><tbody id="lb"></tbody></table></div></div>
@@ -126,6 +127,11 @@ th.srt{cursor:pointer;user-select:none}th.srt:hover{filter:brightness(1.3)}th.sr
 </div></div>
 <dialog id="imd"><b style="font-size:16px">Product images</b><p style="color:var(--mut);font-size:12px">Paste one product per line: PRODUCT NAME, then the image link (copy from Excel or write NAME [space] https://...). Existing images are replaced.</p><textarea id="im_t" rows="9" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:12px monospace"></textarea><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#imd').close()">Cancel</button> <button class="pri" onclick="importImgs()">Save images</button></p></dialog>
 <dialog id="psd" style="width:min(640px,94vw)"><b style="font-size:16px">Paste sheet rows (supplier Excel)</b><p style="color:var(--mut);font-size:12px">Copy the rows from Excel (item rows and the "Transport 36 x 49" lines) and paste here. Uses the Photo party field. Cartoon = 1, Pcs = CBM (8th column), Price = rate (11th column) &divide; 4.</p><textarea id="ps_t" rows="12" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:12px monospace;white-space:pre"></textarea><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#psd').close()">Cancel</button> <button class="pri" onclick="pasteSheet()">Fill Bulk Entry</button></p></dialog>
+<dialog id="wad" style="width:min(460px,94vw)"><b style="font-size:16px">Statement details</b>
+<label>Business name (shown on PDF)</label><input id="wa_biz" placeholder="e.g. Cheaperzone">
+<label>Contact line (phone, website)</label><input id="wa_bl" placeholder="e.g. +91 98XXXXXXXX | cheaperzone.in">
+<label>Entries to include</label><select id="wa_n"><option value="0" selected>All entries</option><option value="5">Last 5</option><option value="10">Last 10</option><option value="20">Last 20</option><option value="50">Last 50</option></select>
+<p style="text-align:right;margin-bottom:0"><button class="pri" onclick="stSave()">Done</button></p></dialog>
 <dialog id="npd"><b style="font-size:16px">New party</b><label>Party name</label><input id="np_n"><label>Opening balance</label><input id="np_o" type="number" step="any" placeholder="0"><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#npd').close()">Cancel</button> <button class="pri" onclick="saveParty()">Add party</button></p></dialog>
 <dialog id="dlg"><b id="dt" style="font-size:16px">Edit entry</b><div id="df"></div><div id="dw" class="warn hide">This entry is marked Matched. Editing will clear the mark.</div><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#dlg').close()">Cancel</button> <button class="pri" onclick="saveEdit()">Save</button></p></dialog>
 <div id="blk" class="tab hide"><div class="card noprint">
@@ -211,7 +217,10 @@ const SHEET={MAIL:'Mail',PAYMENT:'Payments',EXTRA:'Extra'}, LIST={MAIL:'mail',PA
 const pname=v=>{const x=D.parties.find(p=>p.name.toLowerCase()===String(v).trim().toLowerCase());return x?x.name:null;};
 
 async function call(action,p={}){
-  const r=await fetch(API,{method:'POST',body:JSON.stringify({key:KEY,action,...p})});
+  const ac=new AbortController(), tm=setTimeout(()=>ac.abort(),90000); let r;
+  try{ r=await fetch(API,{method:'POST',body:JSON.stringify({key:KEY,action,...p}),signal:ac.signal}); }
+  catch(e){ throw new Error(e.name==='AbortError'?'The server is taking too long. Try again in a minute.':'Could not reach the server ('+e.message+'). Check the Web App URL, deployment access (Anyone) and your internet.'); }
+  finally{ clearTimeout(tm); }
   let j; try{ j=await r.json(); }catch(e){ throw new Error('Could not read the server response. Check the Web App URL.'); }
   if(!j.ok){ if(/Unknown action/.test(j.error)) throw new Error('The new Code.gs is not deployed. In Apps Script: Deploy > Manage deployments > Edit > Version: New version > Deploy.'); if(/lock/i.test(j.error)) throw new Error('Sheet is busy (sync running). Try again in 30 seconds.'); throw new Error(j.error); } return j.data;
 }
@@ -547,6 +556,58 @@ async function importImgs(){
   if(!items.length) return alert('No valid lines found (NAME then https link)');
   say('Saving '+items.length+' images...'); $('#imd').close();
   try{ let n=0; for(let i=0;i<items.length;i+=300) n+=await saveImgs(items.slice(i,i+300)); say('\u2713 '+n+' of '+items.length+' images matched to Product Master'); redraw(); }catch(e){ say(e.message,true); } }
+// ---------- Customer statement PDF ----------
+function waData(){ const name=pname($('#lp').value); if(!name) return null; const p=parties.find(x=>x.party_name===name), rows=ledgerRows(D,mult,name,p.opening_balance), n=+$('#wa_n').value, L=n?rows.slice(-n):rows;
+  return {name,p,rows,L,prev:L.length<rows.length?rows[rows.length-L.length-1].pending:p.opening_balance,f:p.final_pending}; }
+async function waPdf(d){
+  const {PDFDocument,StandardFonts,rgb}=PDFLib, doc=await PDFDocument.create(), F=await doc.embedFont(StandardFonts.Helvetica), B=await doc.embedFont(StandardFonts.HelveticaBold), I=await doc.embedFont(StandardFonts.HelveticaOblique);
+  const W=595,H=842,M=36,R=W-M, NAVY=rgb(.11,.14,.33), ACC=rgb(.31,.27,.9), INK=rgb(.1,.12,.2), MUT=rgb(.42,.46,.56), LN=rgb(.89,.91,.95), GRN=rgb(.06,.47,.24), RED=rgb(.74,.1,.25), WHITE=rgb(1,1,1);
+  const san=t=>String(t==null?'':t).replace(/[^\x20-\x7E]/g,'?'), money=n=>n<-0.005?'('+fmt(-n)+')':fmt(n);
+  const biz=($('#wa_biz').value||'').trim()||'Cheaperzone', cline=($('#wa_bl').value||'').trim();
+  const pages=[]; let pg, y;
+  const T=(t,x,yy,o={})=>pg.drawText(san(t),{x,y:yy,size:o.s||9,font:o.f||(o.b?B:F),color:o.c||INK});
+  const RT=(t,xr,yy,o={})=>{ t=san(t); const f=o.f||(o.b?B:F); pg.drawText(t,{x:xr-f.widthOfTextAtSize(t,o.s||9),y:yy,size:o.s||9,font:f,color:o.c||INK}); };
+  const cut=(t,w,s)=>{ t=san(t); while(t.length>1&&F.widthOfTextAtSize(t,s)>w) t=t.slice(0,-1); return t; };
+  const X={date:M+8,part:M+60,ctn:268,cpc:334,sales:410,recv:476,bal:R-8};
+  const thead=()=>{ pg.drawRectangle({x:M,y:y-6,width:R-M,height:20,color:NAVY}); const o={b:1,s:7.5,c:WHITE};
+    T('DATE',X.date,y,o); T('PRODUCT NAME',X.part,y,o); RT('CARTOON',X.ctn,y,o); RT('CARTOON PCS',X.cpc,y,o); RT('TOTAL',X.sales,y,o); RT('PAID',X.recv,y,o); RT('BALANCE',X.bal,y,o); y-=24; };
+  const newPage=first=>{ pg=doc.addPage([W,H]); pages.push(pg);
+    if(first){ pg.drawRectangle({x:0,y:H-78,width:W,height:78,color:NAVY}); pg.drawRectangle({x:0,y:H-82,width:W,height:4,color:ACC});
+      T(biz,M,H-38,{b:1,s:20,c:WHITE}); if(cline) T(cline,M,H-58,{s:9,c:rgb(.8,.84,.96)});
+      RT('ACCOUNT STATEMENT',R,H-34,{b:1,s:12,c:WHITE}); RT('Date: '+fd(nowIso()),R,H-54,{s:9,c:rgb(.8,.84,.96)}); y=H-112; }
+    else { pg.drawRectangle({x:0,y:H-34,width:W,height:34,color:NAVY}); T(biz,M,H-22,{b:1,s:11,c:WHITE}); RT('Statement: '+d.name+' (continued)',R,H-22,{s:9,c:WHITE}); y=H-62; } };
+  const sales=d.L.reduce((a,r)=>a+r.total,0), recv=d.L.reduce((a,r)=>a+r.payment,0), f=d.f, first=d.L[0], last=d.L[d.L.length-1];
+  newPage(true);
+  T('SUPPLIER ACCOUNT',M,y,{s:7.5,c:MUT,b:1}); y-=17; T(d.name,M,y,{b:1,s:17}); y-=15;
+  T(d.L.length?'Period: '+fd(first.date)+' to '+fd(last.date)+'   |   '+d.L.length+' entries':'No entries',M,y,{s:9,c:MUT}); y-=26;
+  const cw=(R-M-30)/4, cards=[[d.prev<-0.005?'OPENING (ADVANCE PAID)':'OPENING BALANCE',fmt(Math.abs(d.prev)),d.prev<-0.005?GRN:INK,rgb(.96,.97,.99)],['PURCHASE',fmt(sales),INK,rgb(.96,.97,.99)],['PAYMENTS MADE',fmt(recv),GRN,rgb(.93,.98,.95)],[f<-0.005?'ADVANCE PAID':'BALANCE PAYABLE',fmt(Math.abs(f)),f<-0.005?GRN:RED,f<-0.005?rgb(.9,.97,.92):rgb(1,.93,.94)]];
+  cards.forEach((c,i)=>{ const x=M+i*(cw+10); pg.drawRectangle({x,y:y-40,width:cw,height:46,color:c[3],borderColor:LN,borderWidth:.6}); T(c[0],x+9,y-8,{s:6.8,c:MUT,b:1}); let fs=12; while(fs>8&&B.widthOfTextAtSize('Rs. '+c[1],fs)>cw-18) fs-=.5; T('Rs. '+c[1],x+9,y-28,{b:1,s:fs,c:c[2]}); });
+  y-=70; thead();
+  const rowH=17, line=()=>pg.drawLine({start:{x:M,y:y-5},end:{x:R,y:y-5},thickness:.4,color:LN});
+  if(d.L.length<d.rows.length||d.p.opening_balance){ T('Balance brought forward',X.part,y,{f:I,s:8.5,c:MUT}); RT(money(d.prev),X.bal,y,{c:MUT}); line(); y-=rowH; }
+  d.L.forEach((r,i)=>{ if(y<M+70){ newPage(false); thead(); }
+    if(i%2===0) pg.drawRectangle({x:M,y:y-5,width:R-M,height:rowH,color:rgb(.975,.98,.995)});
+    const isP=r.kind==='PAYMENT', det=isP?'Payment made - '+(r.mode==='BANK'?'Bank':'Cash')+(r.remark?' ('+r.remark+')':''):r.kind==='EXTRA'?(r.remark||'Extra charge'):r.remark;
+    T(fd(r.date),X.date,y,{s:8.5}); T(cut(det,X.ctn-X.part-34,8.5),X.part,y,{s:8.5,c:isP?GRN:INK});
+    if(r.kind==='MAIL'){ RT(String(r.cartons),X.ctn,y,{s:8.5,c:MUT}); RT(String(r.pcs),X.cpc,y,{s:8.5,c:MUT}); }
+    if(r.total) RT(fmt(r.total),X.sales,y,{s:8.5}); if(r.payment) RT(fmt(r.payment),X.recv,y,{s:8.5,c:GRN,b:1}); RT(money(r.pending),X.bal,y,{s:8.5,b:1,c:r.pending<-0.005?GRN:INK}); line(); y-=rowH; });
+  if(y<M+110){ newPage(false); }
+  y-=6; pg.drawRectangle({x:M,y:y-8,width:R-M,height:22,color:rgb(.93,.94,1)}); T('TOTAL',X.part,y,{b:1,s:9}); RT(fmt(sales),X.sales,y,{b:1,s:9}); RT(fmt(recv),X.recv,y,{b:1,s:9,c:GRN}); RT(money(f),X.bal,y,{b:1,s:9,c:f<-0.005?GRN:RED}); y-=14; if(d.prev<-0.005||d.L.some(r=>r.pending<-0.005)||f<-0.005){ T('Amounts in ( ) are advance paid by us.',M,y,{f:I,s:7.5,c:MUT}); } y-=30;
+  pg.drawRectangle({x:M,y:y-34,width:R-M,height:46,color:f<-0.005?rgb(.9,.97,.92):rgb(1,.93,.94),borderColor:f<-0.005?GRN:RED,borderWidth:.8});
+  T(f<-0.005?'CLOSING BALANCE - ADVANCE PAID BY US':'CLOSING BALANCE - PAYABLE TO YOU',M+14,y-8,{b:1,s:8,c:MUT}); T('Rs. '+fmt(Math.abs(f)),M+14,y-28,{b:1,s:17,c:f<-0.005?GRN:RED});
+  pages.forEach((p,i)=>{ p.drawLine({start:{x:M,y:44},end:{x:R,y:44},thickness:.5,color:LN}); p.drawText('This is a computer generated statement.'+(cline?'  '+san(cline):''),{x:M,y:30,size:7.5,font:F,color:MUT});
+    const pt='Page '+(i+1)+' of '+pages.length; p.drawText(pt,{x:R-F.widthOfTextAtSize(pt,7.5),y:30,size:7.5,font:F,color:MUT}); });
+  const bytes=await doc.save(); return new File([bytes],'Statement_'+d.name.replace(/[^\w]+/g,'_')+'_'+nowIso().slice(0,10)+'.pdf',{type:'application/pdf'});
+}
+function stInit(){ if(!$('#wa_biz').value) $('#wa_biz').value=localStorage.getItem('biz_n')||'Cheaperzone'; if(!$('#wa_bl').value) $('#wa_bl').value=localStorage.getItem('biz_l')||'cheaperzone.in'; }
+function stOpen(){ stInit(); $('#wad').showModal(); }
+function stSave(){ localStorage.setItem('biz_n',$('#wa_biz').value); localStorage.setItem('biz_l',$('#wa_bl').value); $('#wad').close(); }
+async function stFile(){ const d=waData(); if(!d){ say('Select a party in the box above first',true); return null; } stInit();
+  try{ localStorage.setItem('biz_n',$('#wa_biz').value); localStorage.setItem('biz_l',$('#wa_bl').value); }catch(e){}
+  try{ return await waPdf(d); }catch(e){ say('PDF could not be created: '+e.message+' (internet needed for the PDF library)',true); return null; } }
+async function stDownload(){ const f=await stFile(); if(!f) return; const a=document.createElement('a'); a.href=URL.createObjectURL(f); a.download=f.name; document.body.appendChild(a); a.click(); a.remove(); say('\u2713 PDF downloaded'); }
+async function stPrint(){ const f=await stFile(); if(!f) return; const u=URL.createObjectURL(f), w=window.open(u,'_blank');
+  if(w) say('PDF opened in a new tab. Press Ctrl+P (Cmd+P on Mac) to print.'); else { const a=document.createElement('a'); a.href=u; a.download=f.name; document.body.appendChild(a); a.click(); a.remove(); say('Pop-up was blocked, so the PDF was downloaded. Open it and print.'); } }
 async function backup(){ say('Creating backup...'); try{ const n=await call('backup'); say('✓ Backup created: '+n+' (in Google Drive)'); }catch(e){ say(e.message,true); } }
 
 sortable('#sum',['party_name','opening_balance','main_purchase','extra_charges','cash_payment','bank_payment','final_pending'],sS,drawSummary);
@@ -555,5 +616,5 @@ sortable('#led',['date','','remark','cartons','pcs','price','total','cash','bank
 sortable('#tp',['n','ord','ctn','pcs','val','avg','val'],aP,drawAna);
 sortable('#tq',['n','ord','ctn','val','avg','pay','val'],aQ,drawAna);
 if(DEFAULT_URL) $('#urlrow').classList.add('hide');
-if(API&&KEY){ $('#au').value=API; $('#pw').value=KEY; signIn(); } else { $('#login').classList.remove('hide'); if(API) $('#au').value=API; }
+if(API&&KEY){ $('#au').value=API; $('#pw').value=KEY; $('#login').classList.remove('hide'); signIn(); } else { $('#login').classList.remove('hide'); if(API) $('#au').value=API; }
 </script></body></html>
