@@ -82,6 +82,10 @@ th.srt{cursor:pointer;user-select:none}th.srt:hover{filter:brightness(1.3)}th.sr
 .sh{height:6px;border-radius:4px;background:var(--priL);min-width:60px}.sh i{display:block;height:100%;border-radius:4px;background:var(--pri)}
 .at{min-width:0}.up{color:var(--ok)}.dn{color:var(--red)}h3{margin:0 0 12px;font-size:15px}
 input.mc{width:20px;height:20px;margin:0 8px 0 0;vertical-align:middle;accent-color:var(--ok);cursor:pointer;padding:0}tr.m td{background:var(--pay)}
+
+#acp{position:fixed;z-index:99999;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.22);max-height:270px;overflow:auto;padding:4px;display:none;font-size:14px}
+#acp div{padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#acp div.on{background:var(--priL);color:var(--pri)}#acp div b{color:var(--pri);font-weight:700}#acp div.no{color:var(--mut);cursor:default;font-size:13px}
 </style></head><body>
 
 <section id="login" class="hide"><main><div class="card">
@@ -773,6 +777,44 @@ async function receiptPdf(id,pty,pv,img){
   }catch(e){ say('Voucher PDF failed: '+e.message,true); }
 }
 async function backup(){ say('Creating backup...'); try{ const n=await call('backup'); say('✓ Backup created: '+n+' (in Google Drive)'); }catch(e){ say(e.message,true); } }
+
+
+// ---------- Better dropdown for Party / Product boxes (type to search, Up/Down keys, Enter to pick)
+(function(){
+  let pop=document.createElement('div'); pop.id='acp'; document.body.appendChild(pop);
+  let cur=null, items=[], act=-1, showAll=false;
+  const norm=t=>String(t||'').toLowerCase();
+  const src=id=>{ const l=document.getElementById(id); return l?[...l.options].map(o=>o.value):[]; };
+  function match(q,all){ q=norm(q).trim(); if(!q) return all.slice(0,80);
+    const a=[],b=[],c=[]; all.forEach(v=>{ const n=norm(v), i=n.indexOf(q); if(i===0) a.push(v); else if(i>0&&/[\s\-_.*(]/.test(n[i-1])) b.push(v); else if(i>0) c.push(v); });
+    return a.concat(b,c).slice(0,80); }
+  function hl(v,q){ q=norm(q).trim(); const i=q?norm(v).indexOf(q):-1; const e=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); return i<0?e(v):e(v.slice(0,i))+'<b>'+e(v.slice(i,i+q.length))+'</b>'+e(v.slice(i+q.length)); }
+  function place(){ if(!cur) return; const r=cur.getBoundingClientRect(), host=cur.closest('dialog')||document.body; if(pop.parentNode!==host) host.appendChild(pop);
+    pop.style.display='block'; const h=Math.min(pop.scrollHeight,270), below=innerHeight-r.bottom, up=below<h+16&&r.top>below;
+    pop.style.minWidth=Math.max(r.width,220)+'px'; pop.style.maxWidth='min(520px,94vw)'; pop.style.left=Math.max(6,Math.min(r.left,innerWidth-Math.max(r.width,220)-8))+'px';
+    pop.style.top=(up?Math.max(6,r.top-h-6):r.bottom+4)+'px'; }
+  function draw(){ const q=showAll?'':cur.value; items=match(q,src(cur.dataset.ac)); if(act>=items.length) act=-1;
+    pop.innerHTML=items.length?items.map((v,i)=>`<div data-i="${i}" class="${i===act?'on':''}">${hl(v,q)}</div>`).join(''):'<div class="no">No match'+(q?' - "'+q.replace(/</g,'&lt;')+'" will be used as typed':'')+'</div>'; place();
+    const on=pop.querySelector('.on'); if(on) on.scrollIntoView({block:'nearest'}); }
+  function open(el){ cur=el; act=-1; showAll=true; draw(); }
+  function close(){ pop.style.display='none'; cur=null; act=-1; }
+  let picking=false;
+  function pick(v){ const el=cur; close(); picking=true; el.value=v; el.dispatchEvent(new Event('input',{bubbles:true})); el.dispatchEvent(new Event('change',{bubbles:true})); picking=false; }
+  function adopt(el){ if(!el||el.tagName!=='INPUT') return false; const l=el.getAttribute('list'); if(l){ el.dataset.ac=l; el.removeAttribute('list'); el.setAttribute('autocomplete','off'); } return !!el.dataset.ac; }
+  document.addEventListener('focusin',e=>{ if(adopt(e.target)){ open(e.target); try{ e.target.select(); }catch(x){} } else if(e.target!==cur&&!pop.contains(e.target)) close(); });
+  document.addEventListener('click',e=>{ const t=e.target; if(t.tagName==='INPUT'&&adopt(t)&&cur!==t) open(t); });
+  document.addEventListener('input',e=>{ if(picking) return; if(e.target===cur||adopt(e.target)){ cur=e.target; act=-1; showAll=false; draw(); } });
+  document.addEventListener('mousedown',e=>{ const d=e.target.closest&&e.target.closest('#acp>div'); if(d){ e.preventDefault(); if(d.dataset.i!=null) pick(items[+d.dataset.i]); } else if(pop.style.display==='block'&&e.target!==cur) close(); },true);
+  document.addEventListener('keydown',e=>{ const t=e.target; if(!(t&&t.tagName==='INPUT')) return; if(!adopt(t)) return;
+    if(pop.style.display!=='block'||cur!==t){ if(e.key==='ArrowDown'||e.key==='ArrowUp'){ open(t); e.preventDefault(); } return; }
+    if(showAll&&(e.key==='ArrowDown'||e.key==='ArrowUp')){ /* keep full list */ }
+    if(e.key==='ArrowDown'){ e.preventDefault(); act=items.length?(act+1)%items.length:-1; draw(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); act=items.length?(act<=0?items.length-1:act-1):-1; draw(); }
+    else if(e.key==='Enter'){ if(act>=0&&items[act]){ e.preventDefault(); e.stopPropagation(); pick(items[act]); } else close(); }
+    else if(e.key==='Tab'){ if(act>=0&&items[act]) pick(items[act]); else close(); }
+    else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(); } },true);
+  addEventListener('resize',()=>{ if(cur) place(); }); addEventListener('scroll',()=>{ if(cur) place(); },true);
+})();
 
 sortable('#sum',['party_name','opening_balance','main_purchase','extra_charges','cash_payment','bank_payment','final_pending'],sS,drawSummary);
 sortable('#lst',['date','bill','party','kind','amt'],lS,drawList);
