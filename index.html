@@ -6,6 +6,9 @@
 <style>
 :root{--bg:#f4f6fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e8ecf3;--pri:#4f46e5;--priL:#eef0ff;--mail:#f3f7ff;--pay:#effaf3;--ext:#fff8e6;--ok:#16a34a;--red:#e11d48;--side:#0f172a;--sh:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06)}
 @media(prefers-color-scheme:dark){:root{--bg:#0b1020;--card:#131a2b;--ink:#e8ecf6;--mut:#94a3b8;--line:#222c42;--pri:#818cf8;--priL:#232b52;--mail:#16233d;--pay:#12281d;--ext:#2f2a14;--ok:#4ade80;--red:#fb7185;--side:#0a0f1d;color-scheme:dark}}
+:root[data-theme=light]{--bg:#f4f6fb;--card:#fff;--ink:#0f172a;--mut:#64748b;--line:#e8ecf3;--pri:#4f46e5;--priL:#eef0ff;--mail:#f3f7ff;--pay:#effaf3;--ext:#fff8e6;--ok:#16a34a;--red:#e11d48;--side:#0f172a;color-scheme:light}
+:root[data-theme=dark]{--bg:#0b1020;--card:#131a2b;--ink:#e8ecf6;--mut:#94a3b8;--line:#222c42;--pri:#818cf8;--priL:#232b52;--mail:#16233d;--pay:#12281d;--ext:#2f2a14;--ok:#4ade80;--red:#fb7185;--side:#0a0f1d;color-scheme:dark}
+
 *{box-sizing:border-box}body{margin:0;font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink)}
 header{position:fixed;inset:0 auto 0 0;width:208px;z-index:5;display:flex;flex-direction:column;gap:6px;padding:22px 14px;background:var(--side);color:#cbd5e1}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:#fff;padding:0 8px 20px}
@@ -67,7 +70,7 @@ dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);co
 #login main{margin:0;padding:16px;width:min(400px,100%)}#login .logo{color:var(--ink);padding:0 0 14px}
 @media(max-width:900px){header{position:sticky;inset:auto;top:0;width:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:10px 12px}.logo{padding:0}nav{flex-direction:row;overflow:auto;flex:1 1 100%;order:3}main{margin-left:0;padding:14px}}
 @media print{th.srt:after{content:none!important}@page{size:A4 landscape;margin:8mm}
-:root{--bg:#fff;--card:#fff;--ink:#000;--mut:#444;--line:#cbd5e1;--mail:#f3f7ff;--pay:#effaf3;--ext:#fff8e6;--priL:#eef0ff;--pri:#3730a3;--ok:#15803d;--red:#be123c}
+:root:root:root{--bg:#fff;--card:#fff;--ink:#000;--mut:#444;--line:#cbd5e1;--mail:#f3f7ff;--pay:#effaf3;--ext:#fff8e6;--priL:#eef0ff;--pri:#3730a3;--ok:#15803d;--red:#be123c}
 header,.noprint,#msg,.stats,.act{display:none!important}body{background:#fff;color:#000}main{margin:0!important;padding:0!important}
 .card{box-shadow:none;border:0;padding:0 0 8px;margin-bottom:8px;break-inside:avoid}.wrap,.card.wrap{max-height:none!important;overflow:visible!important;min-height:0!important}
 table{min-width:0!important;width:100%!important;table-layout:auto}th,td{position:static!important;padding:4px 6px!important;font-size:10px!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -86,7 +89,18 @@ input.mc{width:20px;height:20px;margin:0 8px 0 0;vertical-align:middle;accent-co
 #acp{position:fixed;z-index:99999;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.22);max-height:270px;overflow:auto;padding:4px;display:none;font-size:14px}
 #acp div{padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #acp div.on{background:var(--priL);color:var(--pri)}#acp div b{color:var(--pri);font-weight:700}#acp div.no{color:var(--mut);cursor:default;font-size:13px}
-</style></head><body>
+
+input[type=date]::-webkit-calendar-picker-indicator{opacity:0;position:absolute;right:0;width:40px;height:100%;cursor:pointer}
+input[type=date]{position:relative;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+#dpp{position:fixed;z-index:99999;width:288px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 36px rgba(15,23,42,.25);padding:12px;display:none;color:var(--ink);font-size:13px;user-select:none}
+#dpp .dh{display:flex;gap:6px;align-items:center;margin-bottom:8px}#dpp .dh select{padding:6px 20px 6px 8px;font-size:13px;min-width:0;background-position:right 6px center}#dpp .dh select[data-m]{flex:1.6}#dpp .dh select[data-y]{flex:1}
+#dpp .dh button{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-size:16px;line-height:1;padding:0}
+#dpp .dw,#dpp .dg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}#dpp .dw span{color:var(--mut);font-size:11px;padding:4px 0;font-weight:600}
+#dpp .dg button{border:0;background:transparent;color:var(--ink);height:34px;border-radius:8px;cursor:pointer;font-size:13px;padding:0}#dpp .dg button:hover{background:var(--priL)}
+#dpp .dg button.o{color:var(--mut);opacity:.55}#dpp .dg button.t{box-shadow:inset 0 0 0 1.5px var(--pri)}#dpp .dg button.s{background:var(--pri);color:#fff;font-weight:700}
+#dpp .df{display:flex;gap:6px;margin-top:10px}#dpp .df button{flex:1;padding:7px 4px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-size:12.5px}#dpp .df button:hover{background:var(--priL);color:var(--pri)}
+</style><script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head><body>
 
 <section id="login" class="hide"><main><div class="card">
 <div class="logo" style="font-size:22px">Party Hisab</div>
@@ -97,7 +111,7 @@ input.mc{width:20px;height:20px;margin:0 8px 0 0;vertical-align:middle;accent-co
 <section id="app" class="hide">
 <header><span class="logo">Party Hisab</span>
 <nav><button data-t="sum">&#9638;&nbsp; Summary</button><button data-t="led">&#9776;&nbsp; Ledger</button><button data-t="ent">&#65291;&nbsp; New Entry</button><button data-t="bil">&#129534;&nbsp; Bills</button><button data-t="blk">&#9638;&nbsp; Bulk Entry</button><button data-t="lst">&#9776;&nbsp; Entry List</button><button data-t="ana">&#9650;&nbsp; Analytics</button></nav>
-<span id="who">Owner</span><span id="sync" style="font-size:12px;color:#94a3b8;padding:0 8px"></span><button class="btn" onclick="$('#imd').showModal()">Product Images</button><button class="btn" onclick="backup()">Backup</button><button class="btn" onclick="rebuildAllUi()">Rebuild Sheet</button><button class="btn" onclick="logout()">Sign out</button></header>
+<span id="who">Owner</span><span id="sync" style="font-size:12px;color:#94a3b8;padding:0 8px"></span><button class="btn" onclick="$('#imd').showModal()">Product Images</button><button class="btn" onclick="backup()">Backup</button><button class="btn" onclick="rebuildAllUi()">Rebuild Sheet</button><button class="btn" id="thb" onclick="cycleTheme()">Theme</button><button class="btn" onclick="logout()">Sign out</button></header>
 <main><div id="msg"></div>
 
 <div id="sum" class="tab hide">
@@ -815,6 +829,39 @@ async function backup(){ say('Creating backup...'); try{ const n=await call('bac
     else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(); } },true);
   addEventListener('resize',()=>{ if(cur) place(); }); addEventListener('scroll',()=>{ if(cur) place(); },true);
 })();
+
+
+// ---------- Calendar popup for date boxes (click a date box; also pick Today / Yesterday)
+(function(){
+  const pop=document.createElement('div'); pop.id='dpp'; document.body.appendChild(pop);
+  let el=null, vy=0, vm=0; const MN=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const p2=n=>String(n).padStart(2,'0'), iso=(y,m,d)=>y+'-'+p2(m+1)+'-'+p2(d), todayD=()=>{ const d=new Date(); return iso(d.getFullYear(),d.getMonth(),d.getDate()); };
+  function place(){ const r=el.getBoundingClientRect(), host=el.closest('dialog')||document.body; if(pop.parentNode!==host) host.appendChild(pop); pop.style.display='block';
+    const h=pop.offsetHeight, below=innerHeight-r.bottom, up=below<h+16&&r.top>below; pop.style.left=Math.max(6,Math.min(r.left,innerWidth-300))+'px'; pop.style.top=(up?Math.max(6,r.top-h-6):r.bottom+6)+'px'; }
+  function draw(){ const cur=el.value, td=todayD(), first=new Date(vy,vm,1), off=(first.getDay()+6)%7, dim=new Date(vy,vm+1,0).getDate(), prevDim=new Date(vy,vm,0).getDate();
+    let yrs=''; const y0=new Date().getFullYear(); for(let y=Math.min(y0-5,vy);y<=Math.max(y0+3,vy);y++) yrs+=`<option ${y===vy?'selected':''}>${y}</option>`;
+    let cells=''; for(let i=0;i<42;i++){ let d,m=vm,y=vy,o=''; if(i<off){ d=prevDim-off+i+1; m=vm-1; o='o'; } else if(i>=off+dim){ d=i-off-dim+1; m=vm+1; o='o'; } else d=i-off+1; const dt=new Date(y,m,d), s=iso(dt.getFullYear(),dt.getMonth(),dt.getDate());
+      cells+=`<button type="button" class="${o} ${s===td?'t':''} ${s===cur?'s':''}" data-d="${s}">${dt.getDate()}</button>`; }
+    pop.innerHTML=`<div class="dh"><button type="button" data-n="-1">&#8249;</button><select data-m>${MN.map((n,i)=>`<option value="${i}" ${i===vm?'selected':''}>${n}</option>`).join('')}</select><select data-y>${yrs}</select><button type="button" data-n="1">&#8250;</button></div>
+    <div class="dw"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div><div class="dg">${cells}</div>
+    <div class="df"><button type="button" data-d="${(()=>{ const d=new Date(); d.setDate(d.getDate()-1); return iso(d.getFullYear(),d.getMonth(),d.getDate()); })()}">Yesterday</button><button type="button" data-d="${td}">Today</button><button type="button" data-d="">Clear</button></div>`; place(); }
+  function open(t){ el=t; const v=/^\d{4}-\d{2}-\d{2}$/.test(t.value)?t.value:todayD(); vy=+v.slice(0,4); vm=+v.slice(5,7)-1; draw(); }
+  function close(){ pop.style.display='none'; el=null; }
+  function set(v){ const t=el; close(); t.value=v; t.dispatchEvent(new Event('input',{bubbles:true})); t.dispatchEvent(new Event('change',{bubbles:true})); }
+  document.addEventListener('click',e=>{ const t=e.target; if(t.tagName==='INPUT'&&t.type==='date'){ if(el!==t) open(t); e.preventDefault(); } },true);
+  document.addEventListener('mousedown',e=>{ const t=e.target; if(pop.contains(t)){ const b=t.closest('button'); if(b){ e.preventDefault(); if(b.dataset.n){ vm+=+b.dataset.n; if(vm<0){ vm=11; vy--; } if(vm>11){ vm=0; vy++; } draw(); } else if(b.dataset.d!=null) set(b.dataset.d); } return; }
+    if(el&&t!==el) close(); },true);
+  pop.addEventListener('change',e=>{ if(e.target.dataset.m!=null) vm=+e.target.value; if(e.target.dataset.y!=null) vy=+e.target.value; draw(); });
+  document.addEventListener('keydown',e=>{ if(el&&e.key==='Escape'){ e.stopPropagation(); close(); } },true);
+  addEventListener('resize',()=>{ if(el) place(); }); addEventListener('scroll',e=>{ if(el&&!pop.contains(e.target)) place(); },true);
+})();
+
+
+// ---------- Theme: Auto / Light / Dark
+function applyTheme(){ let m='auto'; try{ m=localStorage.getItem('theme')||'auto'; }catch(e){} const r=document.documentElement; if(m==='light'||m==='dark') r.setAttribute('data-theme',m); else r.removeAttribute('data-theme');
+  const b=document.getElementById('thb'); if(b) b.textContent=m==='light'?'☀ Light mode':m==='dark'?'☾ Dark mode':'◐ Theme: Auto'; }
+function cycleTheme(){ let m='auto'; try{ m=localStorage.getItem('theme')||'auto'; }catch(e){} const n=m==='auto'?'light':m==='light'?'dark':'auto'; try{ localStorage.setItem('theme',n); }catch(e){} applyTheme(); }
+applyTheme();
 
 sortable('#sum',['party_name','opening_balance','main_purchase','extra_charges','cash_payment','bank_payment','final_pending'],sS,drawSummary);
 sortable('#lst',['date','bill','party','kind','amt'],lS,drawList);
