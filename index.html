@@ -99,6 +99,12 @@ input[type=date]{position:relative;background-image:url("data:image/svg+xml,%3Cs
 #dpp .dg button{border:0;background:transparent;color:var(--ink);height:34px;border-radius:8px;cursor:pointer;font-size:13px;padding:0}#dpp .dg button:hover{background:var(--priL)}
 #dpp .dg button.o{color:var(--mut);opacity:.55}#dpp .dg button.t{box-shadow:inset 0 0 0 1.5px var(--pri)}#dpp .dg button.s{background:var(--pri);color:#fff;font-weight:700}
 #dpp .df{display:flex;gap:6px;margin-top:10px}#dpp .df button{flex:1;padding:7px 4px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-size:12.5px}#dpp .df button:hover{background:var(--priL);color:var(--pri)}
+
+input[type=date]{min-width:168px;padding-right:42px;color:var(--ink);-webkit-text-fill-color:var(--ink);font-variant-numeric:tabular-nums}
+input[type=date]::-webkit-calendar-picker-indicator{display:none!important;-webkit-appearance:none}
+input[type=date]::-webkit-datetime-edit,input[type=date]::-webkit-datetime-edit-fields-wrapper,input[type=date]::-webkit-datetime-edit-day-field,input[type=date]::-webkit-datetime-edit-month-field,input[type=date]::-webkit-datetime-edit-year-field,input[type=date]::-webkit-datetime-edit-text{color:var(--ink);-webkit-text-fill-color:var(--ink);opacity:1;padding-left:1px;padding-right:1px}
+select{color:var(--ink);-webkit-text-fill-color:var(--ink);opacity:1;min-height:42px;line-height:1.3;text-overflow:ellipsis;white-space:nowrap}
+select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
 </style><script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head><body>
 
@@ -311,7 +317,7 @@ function ledgerRows(D,mult,name,opening){
   let p=opening; o.forEach(r=>{p+=r.total-r.payment; r.pending=p;}); return o;
 }
 //CALC-END
-const DEFAULT_URL="https://script.google.com/macros/s/AKfycbxdEz4lX09ZcDva5uEnK093RxxP4kxgy7GP_EWyWoiJYG0PV5VNhkPRajl0sy-_hTARnA/exec"; // optional: paste your Web App URL here so it is never asked again
+const DEFAULT_URL="https://script.google.com/macros/s/AKfycbxZ5b5L6nqvQe9vFw1nXfWuWPQsQs7WNRKolSDXWBqMdmtkTi3PBytLqfl1b46-CKNH2A/exec"; // optional: paste your Web App URL here so it is never asked again
 let imgs={}; const IU=n=>imgs[String(n).trim().toUpperCase()]||'';
 const thumb=(n,edit)=>{ const u=IU(n); return u?`<img class="th" loading="lazy" src="${esc(u)}" alt="" onerror="this.style.display='none'">`:(edit?`<span class="th th0" title="Add image" data-n="${esc(n)}" onclick="setImg(this.dataset.n)">+</span>`:''); };
 let API=localStorage.getItem('gs_url')||DEFAULT_URL, KEY=localStorage.getItem('gs_key')||'';
@@ -863,6 +869,7 @@ function applyTheme(){ let m='auto'; try{ m=localStorage.getItem('theme')||'auto
 function cycleTheme(){ let m='auto'; try{ m=localStorage.getItem('theme')||'auto'; }catch(e){} const n=m==='auto'?'light':m==='light'?'dark':'auto'; try{ localStorage.setItem('theme',n); }catch(e){} applyTheme(); }
 applyTheme();
 
+document.querySelectorAll('select').forEach(function(s){ if(s.selectedIndex<0&&s.options.length) s.selectedIndex=0; });
 sortable('#sum',['party_name','opening_balance','main_purchase','extra_charges','cash_payment','bank_payment','final_pending'],sS,drawSummary);
 sortable('#lst',['date','bill','party','kind','amt'],lS,drawList);
 sortable('#led',['date','bill','remark','total','cash','bank','pending'],lG,loadLedger);
