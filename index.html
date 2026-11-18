@@ -134,7 +134,7 @@ select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
 <div class="card bar noprint"><div><label>Party</label><input id="lp" list="plist2" placeholder="Type or select party" onchange="loadLedger()"></div>
 <button class="btn" onclick="stPrint()">Print</button><button class="btn" onclick="stDownload()">Download PDF</button><button class="btn" title="Statement details (business name, entries)" onclick="stOpen()">&#9881;</button><button class="btn" id="mmb" onclick="mmToggle()">&#10003; Match mode</button></div>
 <div class="card noprint hide" id="mprog"><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><b id="mpt"></b><div class="sh" style="flex:1;min-width:120px"><i id="mpb" style="width:0"></i></div><select id="mf" onchange="loadLedger()" style="width:auto"><option value="all">Show all</option><option value="open">Not matched only</option><option value="done">Matched only</option></select><button class="btn" onclick="mAll(1)">Tick all shown</button><button class="btn" onclick="mAll(0)">Untick all shown</button></div><div style="font-size:12px;color:var(--mut);margin-top:6px">Tick each entry as you check it against the party's statement. Compare the <b>Pending</b> column with the party's balance at that line. Saves instantly.</div></div>
-<div class="card kpi"><div><small>Party</small><b id="k0">-</b></div><div><small>Opening Balance</small><b id="k1">-</b></div>
+<div class="card kpi"><div><small>Party</small><b id="k0">-</b></div><div><small>Opening Balance <a class="pn" id="obe" title="Badlo" onclick="obOpen($('#k0').textContent)" style="cursor:pointer">✎</a></small><b id="k1">-</b></div>
 <div><small>Final Pending</small><b id="k2">-</b></div><div><small>Last Matched</small><b id="k3">-</b><i id="k4"></i></div></div>
 <div class="card wrap"><table><thead><tr><th>Date</th><th>Bill No.</th><th>Party Name</th><th class="n">Amount</th><th class="n">Cash</th><th class="n">Bank</th><th class="n">Pending</th><th class="noprint act"></th></tr></thead><tbody id="lb"></tbody></table></div></div>
 
@@ -164,6 +164,9 @@ select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
 </div></div>
 <dialog id="imd"><b style="font-size:16px">Product images</b><p style="color:var(--mut);font-size:12px">Paste one product per line: PRODUCT NAME, then the image link (copy from Excel or write NAME [space] https://...). Existing images are replaced.</p><textarea id="im_t" rows="9" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:12px monospace"></textarea><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#imd').close()">Cancel</button> <button class="pri" onclick="importImgs()">Save images</button></p></dialog>
 <dialog id="psd" style="width:min(640px,94vw)"><b style="font-size:16px">Paste sheet rows (supplier Excel)</b><p style="color:var(--mut);font-size:12px">Copy the rows from Excel (item rows and the "Transport 36 x 49" lines) and paste here. Uses the Photo party field. Cartoon = 1, Pcs = CBM (8th column), Price = rate (11th column) &divide; 4.</p><textarea id="ps_t" rows="12" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:12px monospace;white-space:pre"></textarea><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#psd').close()">Cancel</button> <button class="pri" onclick="pasteSheet()">Fill Bulk Entry</button></p></dialog>
+<dialog id="obd" style="width:min(380px,94vw)"><b style="font-size:16px">Opening Balance</b>
+<p id="obn" style="margin:6px 0 10px;font-weight:600"></p><label>Opening balance (₹) &mdash; advance hoy to minus</label>
+<input id="obv" type="number" step="any" style="width:100%"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn" onclick="$('#obd').close()">Cancel</button><button class="btn pri" onclick="obSave()">Save</button></div></dialog>
 <dialog id="pvd" style="width:min(900px,96vw);height:92vh;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px"><b id="pv_t">Preview</b><span><button class="pri" onclick="pvDownload()">Download PDF</button> <button class="btn" onclick="pvImage()">Download Image</button> <button class="btn" onclick="pvClose()">Close</button></span></div><iframe id="pv_f" style="width:100%;height:calc(100% - 44px);border:1px solid var(--line);border-radius:8px;background:#fff"></iframe></dialog>
 <dialog id="frd" style="width:min(640px,96vw)"><b style="font-size:16px">Freight / transport cost (not added to party hisab)</b>
 <p style="color:var(--mut);font-size:13px;margin:6px 0 10px">Set freight rate for each origin city, then mark which party sends from which city. This is only used in Analytics (Cost / pc), never in the party's pending.</p>
@@ -324,7 +327,7 @@ function ledgerRows(D,mult,name,opening){
   let p=opening; o.forEach(r=>{p+=r.total-r.payment; r.pending=p;}); return o;
 }
 //CALC-END
-const DEFAULT_URL="https://script.google.com/macros/s/AKfycbwo8a4G_B-OEDbtfw9DTct3CvfLoOkVLJ6oJONegXQMfyKr3_cowBXKfXRVYacNI0JRvg/exec"; // optional: paste your Web App URL here so it is never asked again
+const DEFAULT_URL="https://script.google.com/macros/s/AKfycbxf7KjVTJEOsAc876ASBQc2f62vBrE3VJIm_KK-wpb5ihOduIOSNQAcBC-twVWqnN-0rQ/exec"; // optional: paste your Web App URL here so it is never asked again
 let imgs={}; const IU=n=>imgs[String(n).trim().toUpperCase()]||'';
 const thumb=(n,edit)=>{ const u=IU(n); return u?`<img class="th" loading="lazy" src="${esc(u)}" alt="" onerror="this.style.display='none'">`:(edit?`<span class="th th0" title="Add image" data-n="${esc(n)}" onclick="setImg(this.dataset.n)">+</span>`:''); };
 let API=localStorage.getItem('gs_url')||DEFAULT_URL, KEY=localStorage.getItem('gs_key')||'';
@@ -374,10 +377,19 @@ function drawSummary(){
   const L=parties.filter(p=>p.party_name.toLowerCase().includes(q)&&(!onlyP||Math.abs(p.final_pending)>0.005));
   if(sS.k) L.sort((a,b)=>sS.dir*cmpv(a,b,sS.k));
   const T=k=>L.reduce((a,p)=>a+Number(p[k]||0),0);
-  const row=(n,o,m,e,c,b,f,tot)=>`<td>${tot?'TOTAL ('+L.length+')':`<span class="av">${esc(n).charAt(0).toUpperCase()}</span><a class="pn" onclick="openLedger(this.dataset.n)" data-n="${esc(n)}">${esc(n)}</a>`}</td><td class="n">${fmt(o)}</td><td class="n">${fmt(m)}</td><td class="n">${fmt(e)}</td><td class="n">${fmt(c)}</td><td class="n">${fmt(b)}</td><td class="n ${f<0?'neg':''}"><b>${fmt(f)}</b></td>`;
+  const row=(n,o,m,e,c,b,f,tot)=>`<td>${tot?'TOTAL ('+L.length+')':`<span class="av">${esc(n).charAt(0).toUpperCase()}</span><a class="pn" onclick="openLedger(this.dataset.n)" data-n="${esc(n)}">${esc(n)}</a> <a class="pn" title="Opening balance badlo" onclick="obOpen(this.dataset.n)" data-n="${esc(n)}" style="opacity:.55;font-size:12px">\u270E</a>`}</td><td class="n">${fmt(o)}</td><td class="n">${fmt(m)}</td><td class="n">${fmt(e)}</td><td class="n">${fmt(c)}</td><td class="n">${fmt(b)}</td><td class="n ${f<0?'neg':''}"><b>${fmt(f)}</b></td>`;
   $('#stot').innerHTML=row('',T('opening_balance'),T('main_purchase'),T('extra_charges'),T('cash_payment'),T('bank_payment'),T('final_pending'),1);
   $('#sb').innerHTML=L.map(p=>'<tr>'+row(p.party_name,p.opening_balance,p.main_purchase,p.extra_charges,p.cash_payment,p.bank_payment,p.final_pending,0)+'</tr>').join('');
   $('#sum .wrap').style.setProperty('--h',($('#sum thead th').offsetHeight||38)+'px');
+}
+
+function obOpen(n){ const p=parties.find(x=>x.party_name===n); if(!p) return; $('#obn').textContent=n; $('#obv').value=p.opening_balance||0; $('#obd').dataset.n=n; $('#obd').showModal(); setTimeout(()=>$('#obv').select(),50); }
+async function obSave(){
+  const n=$('#obd').dataset.n, v=Number($('#obv').value||0);
+  try{ await call('updateParty',{name:n,opening_balance:v}); }catch(e){ return alert('Save failed: '+e.message); }
+  const r=D.parties.find(x=>String(x.name).trim()===n); if(r) r.opening_balance=v;
+  $('#obd').close(); refresh(); drawSummary(); queueSync(n);
+  if($('#lp')&&pname($('#lp').value)===n) loadLedger();
 }
 function openLedger(name){ $('#lp').value=name; tab('led'); loadLedger(); }
 
