@@ -165,6 +165,13 @@ select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
 <dialog id="imd"><b style="font-size:16px">Product images</b><p style="color:var(--mut);font-size:12px">Paste one product per line: PRODUCT NAME, then the image link (copy from Excel or write NAME [space] https://...). Existing images are replaced.</p><textarea id="im_t" rows="9" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:12px monospace"></textarea><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#imd').close()">Cancel</button> <button class="pri" onclick="importImgs()">Save images</button></p></dialog>
 <dialog id="psd" style="width:min(640px,94vw)"><b style="font-size:16px">Paste sheet rows (supplier Excel)</b><p style="color:var(--mut);font-size:12px">Copy the rows from Excel (item rows and the "Transport 36 x 49" lines) and paste here. Uses the Photo party field. Cartoon = 1, Pcs = CBM (8th column), Price = rate (11th column) &divide; 4.</p><textarea id="ps_t" rows="12" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:12px monospace;white-space:pre"></textarea><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#psd').close()">Cancel</button> <button class="pri" onclick="pasteSheet()">Fill Bulk Entry</button></p></dialog>
 <dialog id="pvd" style="width:min(900px,96vw);height:92vh;padding:12px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px"><b id="pv_t">Preview</b><span><button class="pri" onclick="pvDownload()">Download PDF</button> <button class="btn" onclick="pvImage()">Download Image</button> <button class="btn" onclick="pvClose()">Close</button></span></div><iframe id="pv_f" style="width:100%;height:calc(100% - 44px);border:1px solid var(--line);border-radius:8px;background:#fff"></iframe></dialog>
+<dialog id="frd" style="width:min(640px,96vw)"><b style="font-size:16px">Freight / transport cost (not added to party hisab)</b>
+<p style="color:var(--mut);font-size:13px;margin:6px 0 10px">Set freight rate for each origin city, then mark which party sends from which city. This is only used in Analytics (Cost / pc), never in the party's pending.</p>
+<label>Freight rate is per</label><select id="fr_b"><option value="carton">Carton</option><option value="piece">Piece</option><option value="bill">Bill</option></select>
+<label style="margin-top:10px">Origin city &rarr; Surat rate (Rs.)</label><div id="fr_c"></div><p style="margin:6px 0"><button class="btn" onclick="frAddCity()">+ Add city</button></p>
+<label>Party &rarr; origin city</label><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="fr_q" placeholder="Search party..." oninput="frDrawP()" style="flex:1;min-width:160px"><span style="font-size:13px;color:var(--mut)">Set all shown:</span><select id="fr_all" style="width:auto" onchange="frAll(this.value)"></select></div>
+<div style="max-height:300px;overflow:auto;margin-top:8px;border:1px solid var(--line);border-radius:10px"><table class="at" style="min-width:0"><tbody id="fr_p"></tbody></table></div>
+<p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#frd').close()">Cancel</button> <button class="pri" onclick="frSave()">Save</button></p></dialog>
 <dialog id="wad" style="width:min(460px,94vw)"><b style="font-size:16px">Statement details</b>
 <label>Business name (shown on PDF)</label><input id="wa_biz" placeholder="e.g. Cheaperzone">
 <label>Contact line (phone, website)</label><input id="wa_bl" placeholder="e.g. +91 98XXXXXXXX | cheaperzone.in">
@@ -196,11 +203,11 @@ select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
 <div class="frow"><div style="flex:1;min-width:200px"><div class="flab">Party</div><input id="a_party" list="plist2" placeholder="All parties" oninput="drawAna()"></div>
 <div style="flex:1;min-width:200px"><div class="flab">Product</div><input id="a_prod" list="plist" placeholder="All products" oninput="drawAna()"></div>
 <div><div class="flab">Rank by</div><select id="a_sort" onchange="drawAna()"><option value="val">Value</option><option value="ctn">Cartons</option><option value="pcs">Pieces</option><option value="ord">Orders</option></select></div>
-<label class="chk"><input type="checkbox" id="a_cmp" onchange="drawAna()"> Compare with previous period</label><button class="btn" onclick="window.print()">Print</button></div></div>
+<label class="chk"><input type="checkbox" id="a_cmp" onchange="drawAna()"> Compare with previous period</label><button class="btn" onclick="frOpen()">Freight / origin</button><button class="btn" onclick="window.print()">Print</button></div></div>
 <div class="card kpi" id="a_kpi"></div>
 <div class="card"><h3>Monthly trend</h3><div class="cht" id="a_ch"></div><div class="lg"><span><s style="background:var(--pri)"></s>Purchase</span><span><s style="background:var(--ok)"></s>Payments made</span></div></div>
-<div class="card at"><h3>Products</h3><div class="wrap"><table class="at" id="tp"><thead><tr><th>Product</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Pieces</th><th class="n">Value</th><th class="n">Avg price / pc</th><th>Share</th></tr></thead><tbody id="a_pt"></tbody></table></div></div>
-<div class="card at"><h3>Parties</h3><div class="wrap"><table class="at" id="tq"><thead><tr><th>Party</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Purchase</th><th class="n">Avg order</th><th class="n">Payments</th><th>Share</th></tr></thead><tbody id="a_ptb"></tbody></table></div></div>
+<div class="card at"><h3>Products</h3><div class="wrap"><table class="at" id="tp"><thead><tr><th>Product</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Pieces</th><th class="n">Value</th><th class="n">Avg price / pc</th><th class="n" title="Purchase price + freight, divided by pieces">Cost / pc (with freight)</th><th>Share</th></tr></thead><tbody id="a_pt"></tbody></table></div></div>
+<div class="card at"><h3>Parties</h3><div class="wrap"><table class="at" id="tq"><thead><tr><th>Party</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Purchase</th><th class="n">Avg order</th><th class="n">Payments</th><th class="n" title="Freight paid outside the party hisab">Freight</th><th>Share</th></tr></thead><tbody id="a_ptb"></tbody></table></div></div>
 </div>
 <datalist id="plist"></datalist><datalist id="plist2"></datalist>
 </main></section>
@@ -317,11 +324,11 @@ function ledgerRows(D,mult,name,opening){
   let p=opening; o.forEach(r=>{p+=r.total-r.payment; r.pending=p;}); return o;
 }
 //CALC-END
-const DEFAULT_URL="https://script.google.com/macros/s/AKfycbw69Fc7R-b-_vuE0IvCHKQMakj0-rBgyQMy5yYIrEjEB_aNsuAehmm5U2lDtOzunL-3xw/exec"; // optional: paste your Web App URL here so it is never asked again
+const DEFAULT_URL="https://script.google.com/macros/s/AKfycbwru05xxQDOOD_o-TO2w8QXv7eVRiLer0vCE47TUsPEQidZ18KsLWFVx2tF6U5TiItIcQ/exec"; // optional: paste your Web App URL here so it is never asked again
 let imgs={}; const IU=n=>imgs[String(n).trim().toUpperCase()]||'';
 const thumb=(n,edit)=>{ const u=IU(n); return u?`<img class="th" loading="lazy" src="${esc(u)}" alt="" onerror="this.style.display='none'">`:(edit?`<span class="th th0" title="Add image" data-n="${esc(n)}" onclick="setImg(this.dataset.n)">+</span>`:''); };
 let API=localStorage.getItem('gs_url')||DEFAULT_URL, KEY=localStorage.getItem('gs_key')||'';
-let D={parties:[],products:[],mail:[],pay:[],ext:[],mult:4}, parties=[], mult=4, ed=null, prodSet=new Set();
+let SET={}; let D={parties:[],products:[],mail:[],pay:[],ext:[],mult:4}, parties=[], mult=4, ed=null, prodSet=new Set();
 const SHEET={MAIL:'Mail',PAYMENT:'Payments',EXTRA:'Extra'}, LIST={MAIL:'mail',PAYMENT:'pay',EXTRA:'ext'};
 const pname=v=>{const x=D.parties.find(p=>p.name.toLowerCase()===String(v).trim().toLowerCase());return x?x.name:null;};
 
@@ -345,7 +352,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ const t=b.dat
   if(t==='sum') drawSummary(); if(t==='lst'){ if(!$('#lf_from').value) listRange(0); else drawList(); } if(t==='blk'&&!$('#bb').children.length) bInit(); if(t==='ana') anaRange(anaR); });
 
 async function start(){
-  D=await call('getAll'); mult=D.mult||4; refresh(); $('#who').textContent='Owner · '+((API.match(/\/s\/([^/]+)/)||[])[1]||'').slice(0,8)+'…';
+  D=await call('getAll'); SET=D.settings||{}; mult=D.mult||4; refresh(); $('#who').textContent='Owner · '+((API.match(/\/s\/([^/]+)/)||[])[1]||'').slice(0,8)+'…';
   $('#login').classList.add('hide'); $('#app').classList.remove('hide');
   prodSet=new Set(D.products.map(p=>String(p.name).toUpperCase()));
   $('#plist').innerHTML=D.products.map(p=>`<option value="${esc(p.name)}">`).join('');
@@ -637,15 +644,15 @@ function anaRange(r){ anaR=r; const t=today();
 function anaCustom(){ anaR='x'; document.querySelectorAll('#ap .pill').forEach(x=>x.classList.remove('on')); drawAna(); }
 document.querySelectorAll('#ap .pill').forEach(b=>b.onclick=()=>anaRange(b.dataset.r));
 function aggregate(a,b,pn,pr){
-  const R={val:0,ctn:0,pcs:0,ord:0,cash:0,bank:0,days:new Set(),prod:{},party:{},month:{}};
+  const R={val:0,fr:0,ctn:0,pcs:0,ord:0,cash:0,bank:0,days:new Set(),prod:{},party:{},month:{}}, FM=freightMap();
   const inR=d=>{ d=String(d).slice(0,10); return d&&(!a||d>=a)&&(!b||d<=b); };
-  const PA=n=>R.party[n]=R.party[n]||{n,ord:0,ctn:0,pcs:0,val:0,pay:0}, MO=m=>R.month[m]=R.month[m]||{p:0,r:0};
+  const PA=n=>R.party[n]=R.party[n]||{n,ord:0,ctn:0,pcs:0,val:0,pay:0,fr:0}, MO=m=>R.month[m]=R.month[m]||{p:0,r:0};
   D.mail.filter(live).forEach(r=>{
     if(!inR(r.date)||(pn&&r.party!==pn)||(pr&&String(r.product).toUpperCase()!==pr)) return;
-    const q=num(r.cartons)*num(r.pcs), v=q*num(r.price)*mult, k=String(r.product).toUpperCase();
-    R.val+=v; R.ctn+=num(r.cartons); R.pcs+=q; R.ord++; R.days.add(String(r.date).slice(0,10));
-    const P=R.prod[k]=R.prod[k]||{n:r.product,ord:0,ctn:0,pcs:0,val:0}; P.ord++; P.ctn+=num(r.cartons); P.pcs+=q; P.val+=v;
-    const Q=PA(r.party); Q.ord++; Q.ctn+=num(r.cartons); Q.pcs+=q; Q.val+=v; MO(String(r.date).slice(0,7)).p+=v; });
+    const q=num(r.cartons)*num(r.pcs), v=q*num(r.price)*mult, k=String(r.product).toUpperCase(), fr=FM.get(r.id)||0;
+    R.val+=v; R.fr+=fr; R.ctn+=num(r.cartons); R.pcs+=q; R.ord++; R.days.add(String(r.date).slice(0,10));
+    const P=R.prod[k]=R.prod[k]||{n:r.product,ord:0,ctn:0,pcs:0,val:0,fr:0}; P.ord++; P.ctn+=num(r.cartons); P.pcs+=q; P.val+=v; P.fr+=fr;
+    const Q=PA(r.party); Q.ord++; Q.ctn+=num(r.cartons); Q.pcs+=q; Q.val+=v; Q.fr+=fr; MO(String(r.date).slice(0,7)).p+=v; });
   if(!pr) D.pay.filter(live).forEach(r=>{
     if(!inR(r.date)||(pn&&r.party!==pn)) return; const a=num(r.amount);
     if(String(r.mode).toUpperCase()==='BANK') R.bank+=a; else R.cash+=a; PA(r.party).pay+=a; MO(String(r.date).slice(0,7)).r+=a; });
@@ -659,16 +666,42 @@ function drawAna(){
   const dl=(a,b)=>!B?'':(b?`<i class="${a>=b?'up':'dn'}">${a>=b?'▲':'▼'} ${Math.abs((a-b)/b*100).toFixed(1)}% vs ${Number.isInteger(b)?b.toLocaleString('en-IN'):fmt(b)}</i>`:'<i>no previous data</i>');
   const K=(l,v,x)=>`<div><small>${l}</small><b>${v}</b>${x||''}</div>`;
   $('#a_kpi').innerHTML=K('Purchase value','₹ '+fmt(A.val),dl(A.val,B&&B.val))+K('Orders',A.ord,dl(A.ord,B&&B.ord))+K('Cartons',fmt(A.ctn).replace('.00',''),dl(A.ctn,B&&B.ctn))+K('Pieces',Math.round(A.pcs).toLocaleString('en-IN'),dl(A.pcs,B&&B.pcs))
-   +K('Avg order value','₹ '+fmt(A.ord?A.val/A.ord:0))+K('Avg price / piece','₹ '+fmt(A.pcs?A.val/A.pcs:0))+K('Avg per active day','₹ '+fmt(nd?A.val/nd:0),'<i>'+nd+' active days</i>')
+   +K('Avg order value','₹ '+fmt(A.ord?A.val/A.ord:0))+K('Avg price / piece','₹ '+fmt(A.pcs?A.val/A.pcs:0))+(A.fr?K('Freight (not in party hisab)','₹ '+fmt(A.fr),dl(A.fr,B&&B.fr)+'<i>Cost / piece with freight: ₹ '+fmt(A.pcs?(A.val+A.fr)/A.pcs:0)+'</i>'):'')+K('Avg per active day','₹ '+fmt(nd?A.val/nd:0),'<i>'+nd+' active days</i>')
    +(pr?'':K('Payments made','₹ '+fmt(pay),dl(pay,B&&(B.cash+B.bank))+'<i>Cash '+fmt(A.cash)+' ('+(pay?Math.round(A.cash/pay*100):0)+'%) · Bank '+fmt(A.bank)+'</i>'));
   const ms=Object.keys(A.month).sort().slice(-24), mx=Math.max(1,...ms.map(m=>Math.max(A.month[m].p,A.month[m].r)));
   $('#a_ch').innerHTML=ms.map(m=>{ const o=A.month[m]; return `<div class="cg" title="${MN[+m.slice(5)-1]} ${m.slice(0,4)}: Purchase ${fmt(o.p)} | Payments ${fmt(o.r)}"><em>${cmp(o.p)}</em><div class="cb"><i style="height:${o.p/mx*100}%;background:var(--pri)"></i><i style="height:${o.r/mx*100}%;background:var(--ok)"></i></div><small>${MN[+m.slice(5)-1]} '${m.slice(2,4)}</small></div>`; }).join('')||'<div style="color:var(--mut)">No data for this filter.</div>';
-  const top=(o,st,isP)=>Object.values(o).map(p=>({...p,avg:isP?(p.pcs?p.val/p.pcs:0):(p.ord?p.val/p.ord:0)})).sort((a,b)=>st.k?st.dir*cmpv(a,b,st.k):b[sk]-a[sk]).slice(0,100);
+  const top=(o,st,isP)=>Object.values(o).map(p=>({...p,avg:isP?(p.pcs?p.val/p.pcs:0):(p.ord?p.val/p.ord:0),cost:p.pcs?(p.val+(p.fr||0))/p.pcs:0})).sort((a,b)=>st.k?st.dir*cmpv(a,b,st.k):b[sk]-a[sk]).slice(0,100);
   const sh=(x,tot)=>`<td><div class="sh"><i style="width:${tot?x/tot*100:0}%"></i></div><small style="color:var(--mut)">${tot?(x/tot*100).toFixed(1):0}%</small></td>`;
-  $('#a_pt').innerHTML=top(A.prod,aP,1).map(p=>`<tr><td><div class="pn2">${thumb(p.n,1)}<b>${esc(p.n)}</b></div></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n">${p.pcs.toLocaleString('en-IN')}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.pcs?p.val/p.pcs:0)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
-  $('#a_ptb').innerHTML=top(A.party,aQ,0).map(p=>`<tr><td><b>${esc(p.n)}</b></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.ord?p.val/p.ord:0)}</td><td class="n">${fmt(p.pay)}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="7" style="color:var(--mut)">No data</td></tr>';
+  $('#a_pt').innerHTML=top(A.prod,aP,1).map(p=>`<tr><td><div class="pn2">${thumb(p.n,1)}<b>${esc(p.n)}</b></div></td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n">${p.pcs.toLocaleString('en-IN')}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.pcs?p.val/p.pcs:0)}</td><td class="n"><b>${fmt(p.cost)}</b>${p.fr?`<div style="font-size:11px;color:var(--mut)">freight ${fmt(p.pcs?p.fr/p.pcs:0)}</div>`:''}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="8" style="color:var(--mut)">No data</td></tr>';
+  $('#a_ptb').innerHTML=top(A.party,aQ,0).map(p=>`<tr><td><b>${esc(p.n)}</b>${originOf(p.n)?`<div style="font-size:11px;color:var(--mut)">${esc(originOf(p.n))}</div>`:''}</td><td class="n">${p.ord}</td><td class="n">${p.ctn}</td><td class="n"><b>${fmt(p.val)}</b></td><td class="n">${fmt(p.ord?p.val/p.ord:0)}</td><td class="n">${fmt(p.pay)}</td><td class="n">${p.fr?fmt(p.fr):''}</td>${sh(p.val,A.val)}</tr>`).join('')||'<tr><td colspan="8" style="color:var(--mut)">No data</td></tr>';
   say(pr?'Payments are not shown when a product filter is set.':($('#a_cmp').checked&&!(f&&t)?'Select both From and To dates to compare with the previous period.':''));
 }
+
+// ---------- Freight (transport) cost: only for costing, never added to party hisab
+const CITY_DEF={Mumbai:100,Rajkot:250};
+function frCities(){ const c=Object.keys(SET).filter(k=>k.indexOf('freight:')===0).map(k=>k.slice(8)); return c.length?c:Object.keys(CITY_DEF); }
+function frRate(c){ const k='freight:'+c; return k in SET?num(SET[k]):(CITY_DEF[c]||0); }
+function originOf(p){ return String(SET['origin:'+p]||''); }
+function freightMap(){ const M=new Map(), basis=SET.freight_basis||'carton', bills={};
+  D.mail.filter(live).forEach(r=>{ const rate=frRate(originOf(r.party)); if(!rate) return; const c=num(r.cartons);
+    if(basis==='carton') M.set(r.id,c*rate); else if(basis==='piece') M.set(r.id,c*num(r.pcs)*rate);
+    else { const k=r.party+'\u0001'+(r.bill_no||('e:'+r.id)); (bills[k]=bills[k]||{rate,rows:[]}).rows.push(r); } });
+  Object.values(bills).forEach(b=>{ const tot=b.rows.reduce((a,r)=>a+num(r.cartons),0); b.rows.forEach(r=>M.set(r.id,b.rate*(tot?num(r.cartons)/tot:1/b.rows.length))); });
+  return M; }
+let frCity=[], frOrig={};
+function frOpen(){ frCity=frCities().map(n=>({n,r:frRate(n),old:n})); frOrig={}; parties.forEach(p=>{ frOrig[p.party_name]=originOf(p.party_name); }); $('#fr_b').value=SET.freight_basis||'carton'; $('#fr_q').value=''; frDrawC(); frDrawP(); $('#frd').showModal(); }
+function frDrawC(){ $('#fr_c').innerHTML=frCity.map((c,i)=>`<div style="display:flex;gap:8px;margin-bottom:6px"><input value="${esc(c.n)}" oninput="frCity[${i}].n=this.value.trim();frDrawSel()" style="flex:1"><input type="number" step="any" value="${c.r}" oninput="frCity[${i}].r=+this.value||0" style="width:120px"><button class="ic del" onclick="frCity.splice(${i},1);frDrawC();frDrawP()">&times;</button></div>`).join(''); frDrawSel(); }
+function frDrawSel(){ $('#fr_all').innerHTML='<option value="">-</option><option value="__none">No origin</option>'+frCity.filter(c=>c.n).map(c=>`<option>${esc(c.n)}</option>`).join(''); }
+function frAddCity(){ frCity.push({n:'',r:0,old:''}); frDrawC(); }
+function frDrawP(){ const q=($('#fr_q').value||'').toLowerCase(), opts=frCity.filter(c=>c.n).map(c=>c.n);
+  $('#fr_p').innerHTML=parties.filter(p=>!q||p.party_name.toLowerCase().includes(q)).map(p=>`<tr><td><b>${esc(p.party_name)}</b></td><td style="width:180px"><select data-p="${esc(p.party_name)}" onchange="frOrig[this.dataset.p]=this.value" style="padding:6px 28px 6px 10px"><option value="">No origin</option>${opts.map(o=>`<option ${frOrig[p.party_name]===o?'selected':''}>${esc(o)}</option>`).join('')}</select></td></tr>`).join('')||'<tr><td style="color:var(--mut);padding:14px">No party found</td></tr>'; }
+function frAll(v){ if(!v) return; const q=($('#fr_q').value||'').toLowerCase(); parties.filter(p=>!q||p.party_name.toLowerCase().includes(q)).forEach(p=>{ frOrig[p.party_name]=v==='__none'?'':v; }); $('#fr_all').value=''; frDrawP(); }
+async function frSave(){ const items=[], cn=frCity.filter(c=>c.n); const names=new Set(cn.map(c=>c.n));
+  if(names.size!==cn.length) return alert('City names must be different');
+  items.push({key:'freight_basis',value:$('#fr_b').value});
+  cn.forEach(c=>items.push({key:'freight:'+c.n,value:c.r})); frCities().forEach(n=>{ if(!names.has(n)) items.push({key:'freight:'+n,value:''}); });
+  Object.keys(frOrig).forEach(p=>{ const v=names.has(frOrig[p])?frOrig[p]:''; if(v!==originOf(p)) items.push({key:'origin:'+p,value:v}); });
+  say('Saving...'); try{ SET=await call('setSettings',{items}); $('#frd').close(); drawAna(); say('✓ Freight settings saved'); }catch(e){ say('Save failed: '+e.message+' (update Code.gs and deploy a New version)',true); } }
 async function saveImgs(items){
   const n=await call('setImages',{items}); items.forEach(x=>{ const p=D.products.find(q=>String(q.name).trim().toUpperCase()===x.name.toUpperCase()); if(p) p.image=x.image; }); refresh(); return n; }
 async function setImg(name){ const u=prompt('Image link for '+name+':'); if(!u||!/^https?:\/\//.test(u.trim())) return;
@@ -873,8 +906,8 @@ document.querySelectorAll('select').forEach(function(s){ if(s.selectedIndex<0&&s
 sortable('#sum',['party_name','opening_balance','main_purchase','extra_charges','cash_payment','bank_payment','final_pending'],sS,drawSummary);
 sortable('#lst',['date','bill','party','kind','amt'],lS,drawList);
 sortable('#led',['date','bill','remark','total','cash','bank','pending'],lG,loadLedger);
-sortable('#tp',['n','ord','ctn','pcs','val','avg','val'],aP,drawAna);
-sortable('#tq',['n','ord','ctn','val','avg','pay','val'],aQ,drawAna);
+sortable('#tp',['n','ord','ctn','pcs','val','avg','cost','val'],aP,drawAna);
+sortable('#tq',['n','ord','ctn','val','avg','pay','fr','val'],aQ,drawAna);
 if(DEFAULT_URL) $('#urlrow').classList.add('hide');
 if(API&&KEY){ $('#au').value=API; $('#pw').value=KEY; $('#login').classList.remove('hide'); signIn(); } else { $('#login').classList.remove('hide'); if(API) $('#au').value=API; }
 </script></body></html>
