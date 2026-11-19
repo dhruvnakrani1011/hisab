@@ -105,6 +105,37 @@ input[type=date]::-webkit-calendar-picker-indicator{display:none!important;-webk
 input[type=date]::-webkit-datetime-edit,input[type=date]::-webkit-datetime-edit-fields-wrapper,input[type=date]::-webkit-datetime-edit-day-field,input[type=date]::-webkit-datetime-edit-month-field,input[type=date]::-webkit-datetime-edit-year-field,input[type=date]::-webkit-datetime-edit-text{color:var(--ink);-webkit-text-fill-color:var(--ink);opacity:1;padding-left:1px;padding-right:1px}
 select{color:var(--ink);-webkit-text-fill-color:var(--ink);opacity:1;min-height:42px;line-height:1.3;text-overflow:ellipsis;white-space:nowrap}
 select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
+
+/* search */
+#gsw{position:sticky;top:0;z-index:60;padding:0 0 10px;background:var(--bg)}
+#gs{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-size:15px}
+#gsr{position:absolute;left:0;right:0;top:100%;margin-top:-4px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.22);max-height:70vh;overflow:auto;z-index:70}
+#gsr .gh{padding:8px 14px 4px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);font-weight:700}
+#gsr .gi{padding:9px 14px;cursor:pointer;display:flex;justify-content:space-between;gap:10px;font-size:14px}
+#gsr .gi:hover,#gsr .gi.on{background:var(--priL)}
+#gsr .gi small{color:var(--mut)}#gsr .ge{padding:14px;color:var(--mut)}
+@media print{#gsw{display:none}}
+/* view-only */
+.ro .wr,.ro nav button[data-t="ent"],.ro nav button[data-t="blk"],.ro .ic.del,.ro .ic[onclick*="editRow"],.ro .ic[onclick*="editNote"],.ro .ic[onclick*="mark"],.ro .ic[onclick*="billEdit"],.ro #bd_dw,.ro #bd_add{display:none!important}
+/* phone */
+@media(max-width:700px){
+ html{-webkit-text-size-adjust:100%}
+ input,select,textarea{font-size:16px!important}
+ header{padding:8px 10px;gap:6px}header .btn{font-size:12px;padding:6px 9px}.logo{font-size:15px}#who{display:none}
+ nav{position:fixed!important;left:0;right:0;bottom:0;top:auto!important;z-index:80;background:var(--card);border-top:1px solid var(--line);flex-direction:row!important;overflow-x:auto;padding:6px 6px calc(6px + env(safe-area-inset-bottom));gap:4px;box-shadow:0 -4px 18px rgba(0,0,0,.12);width:auto;flex:none}
+ nav button{flex:0 0 auto;white-space:nowrap;font-size:12px;padding:9px 11px;border-radius:10px}
+ main{padding:10px 10px 86px!important}
+ .card{padding:12px;border-radius:14px}
+ .wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+ table{font-size:13px}th,td{padding:8px 7px}
+ .kpi{display:grid!important;grid-template-columns:1fr 1fr;gap:10px}
+ .frow{flex-direction:column;align-items:stretch}.frow>*{min-width:0!important;width:100%}
+ .grid{grid-template-columns:1fr!important}
+ dialog{max-width:96vw!important}
+ .bar{flex-direction:column;align-items:stretch}
+ #gs{padding:10px 12px}
+ .stats{grid-template-columns:1fr 1fr!important;gap:10px}.stat{padding:12px!important}.stat b{font-size:18px!important}
+}
 </style><script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 </head><body>
 
@@ -116,9 +147,9 @@ select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
 
 <section id="app" class="hide">
 <header><span class="logo">Party Hisab</span>
-<nav><button data-t="sum">&#9638;&nbsp; Summary</button><button data-t="led">&#9776;&nbsp; Ledger</button><button data-t="ent">&#65291;&nbsp; New Entry</button><button data-t="bil">&#129534;&nbsp; Bills</button><button data-t="blk">&#9638;&nbsp; Bulk Entry</button><button data-t="lst">&#9776;&nbsp; Entry List</button><button data-t="ana">&#9650;&nbsp; Analytics</button></nav>
-<span id="who">Owner</span><span id="sync" style="font-size:12px;color:#94a3b8;padding:0 8px"></span><button class="btn" onclick="$('#imd').showModal()">Product Images</button><button class="btn" onclick="backup()">Backup</button><button class="btn" onclick="rebuildAllUi()">Rebuild Sheet</button><button class="btn" id="thb" onclick="cycleTheme()">Theme</button><button class="btn" onclick="logout()">Sign out</button></header>
-<main><div id="msg"></div>
+<nav><button data-t="sum">&#9638;&nbsp; Summary</button><button data-t="led">&#9776;&nbsp; Ledger</button><button data-t="ent">&#65291;&nbsp; New Entry</button><button data-t="bil">&#129534;&nbsp; Bills</button><button data-t="blk">&#9638;&nbsp; Bulk Entry</button><button data-t="lst">&#9776;&nbsp; Entry List</button><button data-t="ana">&#9650;&nbsp; Analytics</button><button data-t="cmp">&#9878;&nbsp; Price Compare</button></nav>
+<span id="who">Owner</span><span id="sync" style="font-size:12px;color:#94a3b8;padding:0 8px"></span><button class="btn wr" onclick="$('#imd').showModal()">Product Images</button><button class="btn wr" onclick="backup()">Backup</button><button class="btn wr" onclick="rebuildAllUi()">Rebuild Sheet</button><button class="btn wr" onclick="yeOpen()">Year-end close</button><button class="btn" id="thb" onclick="cycleTheme()">Theme</button><button class="btn" onclick="logout()">Sign out</button></header>
+<main><div id="gsw"><input id="gs" type="search" placeholder="Search party, product, bill, amount..." autocomplete="off"><div id="gsr" class="hide"></div></div><div id="msg"></div>
 
 <div id="sum" class="tab hide">
 <div class="stats"><div class="stat"><span class="si" style="--c:#e11d48">&#8377;</span><small>Total Payable (Pending)</small><b id="s1">-</b></div>
@@ -133,19 +164,20 @@ select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
 <div id="led" class="tab hide">
 <div class="card bar noprint"><div><label>Party</label><input id="lp" list="plist2" placeholder="Type or select party" onchange="loadLedger()"></div>
 <button class="btn" onclick="stPrint()">Print</button><button class="btn" onclick="stDownload()">Download PDF</button><button class="btn" title="Statement details (business name, entries)" onclick="stOpen()">&#9881;</button><button class="btn" id="mmb" onclick="mmToggle()">&#10003; Match mode</button></div>
-<div class="card noprint hide" id="mprog"><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><b id="mpt"></b><div class="sh" style="flex:1;min-width:120px"><i id="mpb" style="width:0"></i></div><select id="mf" onchange="loadLedger()" style="width:auto"><option value="all">Show all</option><option value="open">Not matched only</option><option value="done">Matched only</option></select><button class="btn" onclick="mAll(1)">Tick all shown</button><button class="btn" onclick="mAll(0)">Untick all shown</button></div><div style="font-size:12px;color:var(--mut);margin-top:6px">Tick each entry as you check it against the party's statement. Compare the <b>Pending</b> column with the party's balance at that line. Saves instantly.</div></div>
+<div class="card noprint hide" id="mprog"><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><b id="mpt"></b><div class="sh" style="flex:1;min-width:120px"><i id="mpb" style="width:0"></i></div><select id="mf" onchange="loadLedger()" style="width:auto"><option value="all">Show all</option><option value="open">Not matched only</option><option value="done">Matched only</option></select><button class="btn wr" onclick="mAll(1)">Tick all shown</button><button class="btn wr" onclick="mAll(0)">Untick all shown</button></div><div style="font-size:12px;color:var(--mut);margin-top:6px">Tick each entry as you check it against the party's statement. Compare the <b>Pending</b> column with the party's balance at that line. Saves instantly.</div></div>
 <div class="card kpi"><div><small>Party</small><b id="k0">-</b></div><div><small>Opening Balance <a class="pn" id="obe" title="Badlo" onclick="obOpen($('#k0').textContent)" style="cursor:pointer">✎</a></small><b id="k1">-</b></div>
 <div><small>Final Pending</small><b id="k2">-</b></div><div><small>Last Matched</small><b id="k3">-</b><i id="k4"></i></div></div>
 <div class="card wrap"><table><thead><tr><th>Date</th><th>Bill No.</th><th>Party Name</th><th class="n">Amount</th><th class="n">Cash</th><th class="n">Bank</th><th class="n">Pending</th><th class="noprint act"></th></tr></thead><tbody id="lb"></tbody></table></div></div>
 
 <div id="bil" class="tab hide">
-<div id="bl_list"><div class="card bar noprint"><div style="flex:1"><label>Search bill no. / party</label><input id="bl_q" placeholder="e.g. B0001 or party name" oninput="billsDraw()"></div><button class="pri" onclick="billNew()">+ New bill</button></div>
-<div class="card wrap"><table><thead><tr><th>Bill no.</th><th>Date</th><th>Party</th><th class="n">Items</th><th class="n">Bill total</th><th></th></tr></thead><tbody id="bl_b"></tbody></table></div></div>
+<div id="bl_list"><div class="card bar noprint"><div style="flex:1"><label>Search bill no. / party</label><input id="bl_q" placeholder="e.g. B0001 or party name" oninput="billsDraw()"></div><label class="chk" style="white-space:nowrap"><input type="checkbox" id="bl_tr" onchange="billsDraw()"> In transit only</label><button class="pri wr" onclick="billNew()">+ New bill</button></div>
+<div class="card wrap"><table><thead><tr><th>Bill no.</th><th>Date</th><th>Party</th><th class="n">Items</th><th class="n">Bill total</th><th>Shipment</th><th></th></tr></thead><tbody id="bl_b"></tbody></table></div></div>
 <div id="bl_det" class="hide"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><button class="btn" onclick="billBack()">&larr; All bills</button></div><div><button class="btn" onclick="billPdf(bCur.no,bCur.party)">Download Bill PDF</button> <button class="btn" onclick="billPdf(bCur.no,bCur.party,false,true)">Download Image</button></div></div>
 <h3 id="bd_t" style="margin:14px 0 4px"></h3><div id="bd_s" style="color:var(--mut);font-size:13px;margin-bottom:8px"></div><div id="bd_dw" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap"><label style="font-size:13px">Change date of whole bill:</label><input type="date" id="bd_dt" style="width:170px"><button class="btn" onclick="billDate()">Change date</button></div>
+<div id="bd_sh" style="border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:12px"><b style="font-size:13px">Shipment</b> <span id="sh_st" class="tag"></span><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-top:8px"><div><label>From</label><select id="sh_f"></select></div><div><label>Dispatched</label><input type="date" id="sh_s"></div><div><label>Arrived</label><input type="date" id="sh_a"></div><button class="btn wr" onclick="shSave()">Save shipment</button></div></div>
 <div class="wrap" style="max-height:340px;overflow:auto"><table class="at" style="min-width:0"><thead><tr><th>Product</th><th class="n">Cartons</th><th class="n">Pcs / Carton</th><th class="n">Price</th><th class="n">Total</th><th></th></tr></thead><tbody id="bd_b"></tbody></table></div>
 <div style="text-align:right;margin-top:10px;font-size:16px"><b id="bd_tot"></b></div></div>
-<div class="card"><b>Add item to this bill</b><div class="grid" style="margin-top:8px"><div><label>Date</label><input id="ba_d" type="date"></div><div><label>Product</label><input id="ba_p" list="plist" autocomplete="off" placeholder="Search or type product"></div></div>
+<div class="card" id="bd_add"><b>Add item to this bill</b><div class="grid" style="margin-top:8px"><div><label>Date</label><input id="ba_d" type="date"></div><div><label>Product</label><input id="ba_p" list="plist" autocomplete="off" placeholder="Search or type product"></div></div>
 <div class="grid"><div><label>Cartons</label><input id="ba_c" type="number" step="any"></div><div><label>Pcs per carton</label><input id="ba_pc" type="number" step="any"></div><div><label>Price</label><input id="ba_pr" type="number" step="any"></div></div>
 <p style="margin-bottom:0"><button class="pri" onclick="billAdd()">Add item</button></p></div></div>
 </div>
@@ -164,6 +196,13 @@ select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
 </div></div>
 <dialog id="imd"><b style="font-size:16px">Product images</b><p style="color:var(--mut);font-size:12px">Paste one product per line: PRODUCT NAME, then the image link (copy from Excel or write NAME [space] https://...). Existing images are replaced.</p><textarea id="im_t" rows="9" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:12px monospace"></textarea><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#imd').close()">Cancel</button> <button class="pri" onclick="importImgs()">Save images</button></p></dialog>
 <dialog id="psd" style="width:min(640px,94vw)"><b style="font-size:16px">Paste sheet rows (supplier Excel)</b><p style="color:var(--mut);font-size:12px">Copy the rows from Excel (item rows and the "Transport 36 x 49" lines) and paste here. Uses the Photo party field. Short rows: Code, Cartons, Total CBM, CBM/carton, Rate (Cartoon = cartons, Pcs = CBM &divide; cartons, Price = rate &divide; 4). Long Excel rows and BOX lines (BOX, cartons, ..., rate) also work.</p><textarea id="ps_t" rows="12" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:12px monospace;white-space:pre"></textarea><p style="text-align:right;margin-bottom:0"><button class="btn" onclick="$('#psd').close()">Cancel</button> <button class="pri" onclick="pasteSheet()">Fill Bulk Entry</button></p></dialog>
+<dialog id="yed" style="width:min(520px,94vw)"><b style="font-size:16px">Year-end close</b>
+<p style="color:var(--mut);font-size:13px">All entries up to the date below move to Archive sheets, and each party's closing balance becomes its new Opening Balance. A Drive backup is created first. This cannot be undone from the app.</p>
+<label>Close up to (date)</label><input type="date" id="ye_d" oninput="yeDraw()">
+<div id="ye_s" style="margin:10px 0;font-size:13px"></div>
+<div class="wrap" style="max-height:220px;overflow:auto"><table><thead><tr><th>Party</th><th class="n">Old opening</th><th class="n">New opening</th></tr></thead><tbody id="ye_b"></tbody></table></div>
+<label style="margin-top:10px">Type CLOSE to confirm</label><input id="ye_c" placeholder="CLOSE" autocomplete="off">
+<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn" onclick="$('#yed').close()">Cancel</button><button class="btn pri" id="ye_go" onclick="yeGo()">Close year</button></div></dialog>
 <dialog id="obd" style="width:min(380px,94vw)"><b style="font-size:16px">Opening Balance</b>
 <p id="obn" style="margin:6px 0 10px;font-weight:600"></p><label>Opening balance (₹) &mdash; advance hoy to minus</label>
 <input id="obv" type="number" step="any" style="width:100%"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn" onclick="$('#obd').close()">Cancel</button><button class="btn pri" onclick="obSave()">Save</button></div></dialog>
@@ -200,13 +239,17 @@ select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
 <input type="hidden" id="lf_by" value="created"><input type="hidden" id="lf_kind" value=""></div>
 <div class="card kpi"><div><small>Entries</small><b id="lk1">-</b></div><div><small>Purchase + Extra</small><b id="lk2">-</b></div><div><small>Payment</small><b id="lk3">-</b></div></div>
 <div class="card wrap"><table><thead><tr><th>Date</th><th>Bill No.</th><th>Party Name</th><th>Type</th><th class="n">Amount</th><th class="noprint"></th></tr></thead><tbody id="ll"></tbody></table></div></div>
+<div id="cmp" class="tab hide"><div class="card noprint"><div class="frow"><div style="flex:1;min-width:220px"><div class="flab">Product</div><input id="c_prod" list="plist" placeholder="Type or select product" oninput="cmpDraw()"></div><div><div class="flab">From</div><input type="date" id="c_from" oninput="cmpDraw()"></div><div><div class="flab">To</div><input type="date" id="c_to" oninput="cmpDraw()"></div></div></div>
+<div class="card kpi" id="c_k"></div>
+<div class="card wrap"><b>Supplier comparison</b> <span style="color:var(--mut);font-size:12px">(price = mail price, sorted by last price)</span><table><thead><tr><th>Supplier</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Last price</th><th>Last date</th><th class="n">Avg price</th><th class="n">Lowest</th><th class="n">Highest</th></tr></thead><tbody id="c_s"></tbody></table></div>
+<div class="card wrap"><b>Purchase history</b> <span style="color:var(--mut);font-size:12px">(latest 300, change = vs the same supplier's previous price)</span><table><thead><tr><th>Date</th><th>Supplier</th><th>Bill</th><th class="n">Cartons</th><th class="n">Pcs / ctn</th><th class="n">Price</th><th class="n">Change</th><th class="n">Total</th></tr></thead><tbody id="c_h"></tbody></table></div></div>
 <div id="ana" class="tab hide"><div class="card noprint"><div class="frow">
 <div><div class="flab">Period</div><div class="pills" id="ap"><button class="pill" data-r="m">This month</button><button class="pill" data-r="30">Last 30 days</button><button class="pill" data-r="90">Last 90 days</button><button class="pill" data-r="y">This year</button><button class="pill on" data-r="all">All time</button></div></div>
 <div><div class="flab">From</div><input type="date" id="a_from" onchange="anaCustom()"></div><div><div class="flab">To</div><input type="date" id="a_to" onchange="anaCustom()"></div></div>
 <div class="frow"><div style="flex:1;min-width:200px"><div class="flab">Party</div><input id="a_party" list="plist2" placeholder="All parties" oninput="drawAna()"></div>
 <div style="flex:1;min-width:200px"><div class="flab">Product</div><input id="a_prod" list="plist" placeholder="All products" oninput="drawAna()"></div>
 <div><div class="flab">Rank by</div><select id="a_sort" onchange="drawAna()"><option value="val">Value</option><option value="ctn">Cartons</option><option value="pcs">Pieces</option><option value="ord">Orders</option></select></div>
-<label class="chk"><input type="checkbox" id="a_cmp" onchange="drawAna()"> Compare with previous period</label><button class="btn" onclick="frOpen()">Freight / origin</button><button class="btn" onclick="window.print()">Print</button></div></div>
+<label class="chk"><input type="checkbox" id="a_cmp" onchange="drawAna()"> Compare with previous period</label><button class="btn wr" onclick="frOpen()">Freight / origin</button><button class="btn" onclick="window.print()">Print</button></div></div>
 <div class="card kpi" id="a_kpi"></div>
 <div class="card"><h3>Monthly trend</h3><div class="cht" id="a_ch"></div><div class="lg"><span><s style="background:var(--pri)"></s>Purchase</span><span><s style="background:var(--ok)"></s>Payments made</span></div></div>
 <div class="card at"><h3>Products</h3><div class="wrap"><table class="at" id="tp"><thead><tr><th>Product</th><th class="n">Orders</th><th class="n">Cartons</th><th class="n">Pieces</th><th class="n">Value</th><th class="n">Avg price / pc</th><th class="n" title="Purchase price + freight, divided by pieces">Cost / pc (with freight)</th><th>Share</th></tr></thead><tbody id="a_pt"></tbody></table></div></div>
@@ -253,9 +296,9 @@ var bCur=null;
 function billsAll(){ const m=new Map(); D.mail.filter(r=>live(r)&&r.bill_no).forEach(r=>{ const k=r.party+'\u0001'+r.bill_no, g=m.get(k)||{no:String(r.bill_no),party:r.party,date:r.date,n:0,tot:0}; g.n++; g.tot+=num(r.cartons)*num(r.pcs)*num(r.price)*mult; if(r.date>g.date) g.date=r.date; m.set(k,g); }); return [...m.values()]; }
 function billsDraw(){
   if(!$('#bil')||$('#bil').classList.contains('hide')&&!bCur) return;
-  const q=($('#bl_q').value||'').trim().toLowerCase(); let L=billsAll().filter(b=>!q||b.no.toLowerCase().includes(q)||b.party.toLowerCase().includes(q));
+  const q=($('#bl_q').value||'').trim().toLowerCase(); let L=billsAll().filter(b=>!q||b.no.toLowerCase().includes(q)||b.party.toLowerCase().includes(q)); if($('#bl_tr')&&$('#bl_tr').checked) L=L.filter(b=>{ const x=shGet(b.party,b.no); return x.s&&!x.a; });
   L.sort((a,b)=>(a.date<b.date?1:a.date>b.date?-1:0)||(a.no<b.no?1:-1)); const more=L.length>300; L=L.slice(0,300);
-  $('#bl_b').innerHTML=L.map(b=>`<tr><td><b>${esc(b.no)}</b></td><td>${fd(b.date)}</td><td>${esc(b.party)}</td><td class="n">${b.n}</td><td class="n">${fmt(b.tot)}</td><td class="n" style="white-space:nowrap"><button class="btn" data-no="${esc(b.no)}" data-pt="${esc(b.party)}" onclick="billOpen(this.dataset.no,this.dataset.pt)">Open</button> <button class="btn" data-no="${esc(b.no)}" data-pt="${esc(b.party)}" onclick="billPdf(this.dataset.no,this.dataset.pt)">PDF</button></td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--mut);padding:24px">No bills yet. Click "+ New bill" or save a sale entry.</td></tr>'+'';
+  $('#bl_b').innerHTML=L.map(b=>`<tr><td><b>${esc(b.no)}</b></td><td>${fd(b.date)}</td><td>${esc(b.party)}</td><td class="n">${b.n}</td><td class="n">${fmt(b.tot)}</td><td>${shChip(shGet(b.party,b.no))}</td><td class="n" style="white-space:nowrap"><button class="btn" data-no="${esc(b.no)}" data-pt="${esc(b.party)}" onclick="billOpen(this.dataset.no,this.dataset.pt)">Open</button> <button class="btn" data-no="${esc(b.no)}" data-pt="${esc(b.party)}" onclick="billPdf(this.dataset.no,this.dataset.pt)">PDF</button></td></tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--mut);padding:24px">No bills yet. Click "+ New bill" or save a sale entry.</td></tr>'+'';
   if(more) say('Showing latest 300 bills. Use search to find older ones.');
   if(bCur) billDetail();
 }
@@ -263,7 +306,7 @@ function billOpen(no,party){ bCur={no,party,date:null}; $('#bl_list').classList.
 function billBack(){ bCur=null; $('#bl_det').classList.add('hide'); $('#bl_list').classList.remove('hide'); billsDraw(); }
 function billNew(){ const nm=prompt('Party name (as in Party Master):'); if(nm===null) return; const p=pname(nm); if(!p){ say('Party not found in Party Master. Add the party first (New Entry > + New party).',true); return; }
   bCur={no:nextBill(),party:p,date:null,fresh:true}; $('#bl_list').classList.add('hide'); $('#bl_det').classList.remove('hide'); billDetail(); }
-function billDetail(){ if(!bCur) return;
+function billDetail(){ if(!bCur) return; try{ shFill(); }catch(e){}
   const L=D.mail.filter(r=>live(r)&&r.party===bCur.party&&String(r.bill_no||'')===bCur.no).sort((a,b)=>(a.date<b.date?-1:a.date>b.date?1:0)||(a._r-b._r));
   const tot=L.reduce((a,r)=>a+num(r.cartons)*num(r.pcs)*num(r.price)*mult,0);
   $('#bd_t').textContent='Bill '+bCur.no+' · '+bCur.party; $('#bd_s').textContent=L.length?(L.length+' item(s) · Date '+fd(L[0].date)):'New bill. Add the first item below.';
@@ -334,7 +377,7 @@ function ledgerRows(D,mult,name,opening){
   let p=opening; o.forEach(r=>{p+=r.total-r.payment; r.pending=p;}); return o;
 }
 //CALC-END
-const DEFAULT_URL="https://script.google.com/macros/s/AKfycbzySSMD_bNSFjsqe56VyC3tSNaTO7eqJfzOf9ZxHxnRnBIXXLD_cgKirj3El6sRtO11YQ/exec"; // optional: paste your Web App URL here so it is never asked again
+const DEFAULT_URL="https://script.google.com/macros/s/AKfycbxvQQRP6WH-JeA8NpEQ3TDo9xQpu_o_wviAWhIhK5gpEZPFMR4GKsMNjtOErVGwNXH3Eg/exec"; // optional: paste your Web App URL here so it is never asked again
 let imgs={}; const IU=n=>imgs[String(n).trim().toUpperCase()]||'';
 const thumb=(n,edit)=>{ const u=IU(n); return u?`<img class="th" loading="lazy" src="${esc(u)}" alt="" onerror="this.style.display='none'">`:(edit?`<span class="th th0" title="Add image" data-n="${esc(n)}" onclick="setImg(this.dataset.n)">+</span>`:''); };
 let API=localStorage.getItem('gs_url')||DEFAULT_URL, KEY=localStorage.getItem('gs_key')||'';
@@ -359,7 +402,7 @@ function logout(){ localStorage.removeItem('gs_key'); localStorage.removeItem('g
 function tab(t){ document.querySelectorAll('.tab').forEach(e=>e.classList.add('hide')); $('#'+t).classList.remove('hide');
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t)); say(''); }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; tab(t); if(t==='bil'){ bCur=null; $('#bl_det').classList.add('hide'); $('#bl_list').classList.remove('hide'); billsDraw(); }
-  if(t==='sum') drawSummary(); if(t==='lst'){ if(!$('#lf_from').value) listRange(0); else drawList(); } if(t==='blk'&&!$('#bb').children.length) bInit(); if(t==='ana') anaRange(anaR); });
+  if(t==='sum') drawSummary(); if(t==='lst'){ if(!$('#lf_from').value) listRange(0); else drawList(); } if(t==='blk'&&!$('#bb').children.length) bInit(); if(t==='ana') anaRange(anaR); if(t==='cmp') cmpDraw(); });
 
 
 // ---- Offline-safe saving: entries are queued on this device when internet is down and uploaded later (server skips duplicates by id)
@@ -389,14 +432,120 @@ async function flushQ(){
   qBusy=false;
 }
 window.addEventListener('online',()=>setTimeout(flushQ,1000)); setInterval(()=>{ if(qGet().length) flushQ(); },30000);
+
+// ---- Global search
+(function(){
+ const box=$('#gs'), res=$('#gsr'); let acts=[], cur=-1;
+ const SALE=/Customer/i.test((document.querySelector('.logo')||{}).textContent||'');
+ const sub=(t)=>`<div class="gh">${t}</div>`;
+ function run(){
+  const raw=box.value.trim(); if(!raw){ res.classList.add('hide'); return; }
+  const q=raw.toLowerCase(), qn=raw.replace(/[,\s₹]/g,''), isN=/^-?\d+(\.\d+)?$/.test(qn), qv=isN?parseFloat(qn):NaN;
+  const has=s=>String(s==null?'':s).toLowerCase().includes(q);
+  const amtHit=a=>isN&&(Math.abs(a-qv)<0.005||(qn.length>=4&&Math.round(a)===Math.round(qv)));
+  acts=[]; let html='';
+  const row=(l,r,fn)=>{ acts.push(fn); return `<div class="gi" data-i="${acts.length-1}"><span>${l}</span><small>${r||''}</small></div>`; };
+  const P=(parties||[]).filter(p=>has(p.party_name)).slice(0,6);
+  if(P.length){ html+=sub('Parties')+P.map(p=>row(esc(p.party_name),'Pending '+fmt(p.final_pending),()=>openLedger(p.party_name))).join(''); }
+  const pm=new Map(); D.mail.filter(live).forEach(r=>{ const k=String(r.product||'').trim(); if(k&&has(k)){ const o=pm.get(k.toUpperCase())||{n:k,c:0}; o.c++; pm.set(k.toUpperCase(),o); } });
+  const PR=[...pm.values()].sort((a,b)=>b.c-a.c).slice(0,6);
+  if(PR.length){ html+=sub('Products')+PR.map(o=>row(esc(o.n),o.c+' entr'+(o.c>1?'ies':'y'),()=>gsProduct(o.n))).join(''); }
+  const bm=new Map(); D.mail.filter(live).forEach(r=>{ if(r.bill_no&&has(r.bill_no)){ const k=r.party+'\u0001'+r.bill_no; if(!bm.has(k)) bm.set(k,{no:String(r.bill_no),party:r.party}); } });
+  const BL=[...bm.values()].slice(0,6);
+  if(BL.length){ html+=sub('Bills')+BL.map(b=>row('<b>'+esc(b.no)+'</b> &middot; '+esc(b.party),'',()=>{ tab('bil'); billOpen(b.no,b.party); })).join(''); }
+  const E=[]; const add=(lbl,r,txt,amt)=>{ if(has(txt)||has(r.note)||amtHit(amt)) E.push({lbl,r,txt,amt}); };
+  D.mail.filter(live).forEach(r=>add(SALE?'Sale':'Purchase',r,(r.product||'')+' '+(r.bill_no||''),num(r.cartons)*num(r.pcs)*num(r.price)*mult));
+  D.pay.filter(live).forEach(r=>add(SALE?'Receipt':'Payment',r,(r.remark||'')+' '+(r.mode||''),num(r.amount)));
+  D.ext.filter(live).forEach(r=>add('Extra',r,(r.charge_type||'')+' '+(r.remark||''),num(r.amount)));
+  E.sort((a,b)=>String(b.r.date).localeCompare(String(a.r.date))); const EE=E.slice(0,8);
+  if(EE.length){ html+=sub('Entries')+EE.map(e=>row(fd(e.r.date)+' &middot; '+esc(e.r.party)+' &middot; '+e.lbl+': '+esc((e.txt||'').trim()||'-')+(e.r.note?' <small>('+esc(e.r.note)+')</small>':''),fmt(e.amt),()=>openLedger(e.r.party))).join(''); }
+  res.innerHTML=html||'<div class="ge">No match</div>'; res.classList.remove('hide'); cur=-1;
+ }
+ function go(i){ const f=acts[i]; if(!f) return; res.classList.add('hide'); box.value=''; box.blur(); f(); }
+ box.addEventListener('input',run); box.addEventListener('focus',run);
+ res.addEventListener('mousedown',e=>{ const t=e.target.closest('.gi'); if(t){ e.preventDefault(); go(+t.dataset.i); } });
+ box.addEventListener('keydown',e=>{ const it=[...res.querySelectorAll('.gi')]; if(e.key==='Escape'){ res.classList.add('hide'); return; }
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); if(!it.length) return; cur=(cur+(e.key==='ArrowDown'?1:-1)+it.length)%it.length; it.forEach((x,i)=>x.classList.toggle('on',i===cur)); it[cur].scrollIntoView({block:'nearest'}); }
+  if(e.key==='Enter'){ e.preventDefault(); go(cur>=0?cur:0); } });
+ document.addEventListener('click',e=>{ if(!e.target.closest('#gsw')) res.classList.add('hide'); });
+})();
+
+// ---- Year-end close
+function yeCalc(cut){
+  const ok=r=>r.date&&String(r.date).slice(0,10)<=cut, m={}; let n=0;
+  D.parties.forEach(p=>{ m[p.name]={n:p.name,o:num(p.opening_balance),f:num(p.opening_balance)}; });
+  D.mail.filter(r=>live(r)&&ok(r)).forEach(r=>{ n++; if(m[r.party]) m[r.party].f+=num(r.cartons)*num(r.pcs)*num(r.price)*mult; });
+  D.ext.filter(r=>live(r)&&ok(r)).forEach(r=>{ n++; if(m[r.party]) m[r.party].f+=num(r.amount); });
+  D.pay.filter(r=>live(r)&&ok(r)).forEach(r=>{ n++; if(m[r.party]) m[r.party].f-=num(r.amount); });
+  return {L:Object.values(m).sort((a,b)=>a.n.localeCompare(b.n)),n};
+}
+function yeOpen(){ if(!$('#ye_d').value){ const t=new Date(), y=t.getMonth()>=3?t.getFullYear():t.getFullYear()-1; $('#ye_d').value=y+'-03-31'; } $('#ye_c').value=''; yeDraw(); $('#yed').showModal(); }
+function yeDraw(){ const c=$('#ye_d').value; if(!c){ $('#ye_b').innerHTML=''; $('#ye_s').textContent=''; return; }
+  const r=yeCalc(c); $('#ye_s').innerHTML='<b>'+r.n+'</b> entries up to '+fd(c)+' will be archived. '+r.L.length+' parties get a new opening balance.';
+  $('#ye_b').innerHTML=r.L.map(x=>`<tr><td>${esc(x.n)}</td><td class="n">${fmt(x.o)}</td><td class="n"><b>${fmt(x.f)}</b></td></tr>`).join(''); }
+async function yeGo(){
+  const c=$('#ye_d').value; if(!c) return alert('Select the date');
+  if($('#ye_c').value.trim()!=='CLOSE') return alert('Type CLOSE (capital letters) to confirm');
+  $('#ye_go').disabled=true;
+  try{ say('Creating backup first...'); await call('backup'); say('Closing year...');
+    const r=await call('yearClose',{cutoff:c});
+    D=await call('getAll'); if(typeof SET!=='undefined') SET=D.settings||{}; mult=D.mult||mult; refresh(); redraw(); drawSummary(); try{ loadLedger(); }catch(e){}
+    $('#yed').close(); say('✓ Year closed up to '+fd(c)+' ('+(r.archived.Mail+r.archived.Payments+r.archived.Extra)+' entries archived). Rebuilding sheet...');
+    call('rebuildAll').then(()=>setSync('✓ Sheet rebuilt')).catch(()=>setSync('Press Rebuild Sheet to refresh the sheet tabs',true)); }
+  catch(e){ say('Year close failed: '+e.message,true); }
+  $('#ye_go').disabled=false;
+}
+function roApply(){ document.body.classList.toggle('ro',!!(D&&D.readonly)); }
+
+function gsProduct(n){ cmpOpen(n); }
+
+// ---- Price compare / item history
+function cmpRows(){ const q=($('#c_prod').value||'').trim().toUpperCase(); if(!q) return []; const f=$('#c_from').value,t=$('#c_to').value;
+  const L=D.mail.filter(r=>live(r)&&(!f||String(r.date).slice(0,10)>=f)&&(!t||String(r.date).slice(0,10)<=t));
+  const ex=L.filter(r=>String(r.product).trim().toUpperCase()===q); return ex.length?ex:L.filter(r=>String(r.product).toUpperCase().includes(q)); }
+function cmpOpen(n){ $('#c_prod').value=n; $('#c_from').value=''; $('#c_to').value=''; tab('cmp'); cmpDraw(); window.scrollTo(0,0); }
+function cmpDraw(){
+  const L=cmpRows();
+  if(!$('#c_prod').value.trim()){ $('#c_k').innerHTML=''; $('#c_s').innerHTML='<tr><td colspan="8" style="color:var(--mut)">Select a product to compare suppliers and see its price history.</td></tr>'; $('#c_h').innerHTML=''; return; }
+  if(!L.length){ $('#c_k').innerHTML=''; $('#c_s').innerHTML='<tr><td colspan="8" style="color:var(--mut)">No purchases found.</td></tr>'; $('#c_h').innerHTML=''; return; }
+  const S={}; L.forEach(r=>{ const c=num(r.cartons),pc=num(r.pcs),pr=num(r.price)*mult; const s=S[r.party]||(S[r.party]={p:r.party,n:0,ctn:0,qty:0,val:0,min:1e18,max:0,last:null,minD:''});
+    s.n++; s.ctn+=c; s.qty+=c*pc; s.val+=c*pc*pr; if(pr<s.min){ s.min=pr; s.minD=r.date; } s.max=Math.max(s.max,pr); if(!s.last||String(r.date)>=String(s.last.date)) s.last={date:r.date,pr}; });
+  const A=Object.values(S).map(s=>({...s,avg:s.qty?s.val/s.qty:s.last.pr})).sort((a,b)=>a.last.pr-b.last.pr);
+  const asc=[...L].sort((a,b)=>String(a.date).localeCompare(String(b.date))||(a._r-b._r)), lastR=asc[asc.length-1], prevR=asc.length>1?asc[asc.length-2]:null;
+  const low=A.reduce((m,s)=>s.min<m.min?s:m,A[0]);
+  const chg=prevR?(num(lastR.price)-num(prevR.price))*mult:0;
+  const kp=(t,v,x)=>`<div><small>${t}</small><b>${v}</b>${x?`<div style="font-size:12px;color:var(--mut)">${x}</div>`:''}</div>`;
+  $('#c_k').innerHTML=kp('Cheapest supplier (last price)',esc(A[0].p),fmt(A[0].last.pr)+' on '+fd(A[0].last.date))
+    +kp('Last purchase',fmt(num(lastR.price)*mult),esc(lastR.party)+' &middot; '+fd(lastR.date))
+    +kp('Change vs previous purchase',prevR?((chg>0?'&#9650; ':chg<0?'&#9660; ':'')+fmt(Math.abs(chg))):'-',prevR?('was '+fmt(num(prevR.price)*mult)):'only one purchase')
+    +kp('Lowest ever',fmt(low.min),esc(low.p)+' &middot; '+fd(low.minD));
+  $('#c_s').innerHTML=A.map((s,i)=>`<tr><td><b>${esc(s.p)}</b>${i===0&&A.length>1?' <span class="tag">Cheapest</span>':''}</td><td class="n">${s.n}</td><td class="n">${s.ctn}</td><td class="n"><b>${fmt(s.last.pr)}</b></td><td>${fd(s.last.date)}</td><td class="n">${fmt(s.avg)}</td><td class="n">${fmt(s.min)}</td><td class="n">${fmt(s.max)}</td></tr>`).join('');
+  const prev={}, H=asc.map(r=>{ const pr=num(r.price)*mult, o=prev[r.party]; prev[r.party]=pr; return {r,pr,d:o==null?null:pr-o}; }).reverse().slice(0,300);
+  $('#c_h').innerHTML=H.map(x=>`<tr><td>${fd(x.r.date)}</td><td>${esc(x.r.party)}</td><td>${x.r.bill_no?esc(x.r.bill_no):''}</td><td class="n">${x.r.cartons}</td><td class="n">${x.r.pcs}</td><td class="n">${fmt(x.pr)}</td><td class="n ${x.d>0?'neg':''}">${x.d==null?'':(x.d>0?'&#9650; ':x.d<0?'&#9660; ':'')+fmt(Math.abs(x.d))}</td><td class="n">${fmt(num(x.r.cartons)*num(x.r.pcs)*x.pr)}</td></tr>`).join('');
+}
+
+// ---- Shipment tracking (stored in the Settings tab: ship:<party>|<bill> = from|dispatched|arrived)
+const shKey=(p,b)=>'ship:'+p+'|'+b;
+function shGet(p,b){ const a=String((typeof SET!=='undefined'&&SET[shKey(p,b)])||'').split('|'); return {f:a[0]||'',s:a[1]||'',a:a[2]||''}; }
+const dDiff=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
+function shStat(x){ if(x.a) return {t:'Arrived '+fd(x.a)+(x.s?' · '+dDiff(x.s,x.a)+' days':''),c:'ok'}; if(x.s) return {t:'In transit · day '+dDiff(x.s,new Date().toISOString().slice(0,10)),c:'warn'}; return {t:'',c:''}; }
+function shChip(x){ const s=shStat(x); return s.t?`<span class="tag" style="${s.c==='warn'?'background:#fef3c7;color:#92400e':''}">${esc(s.t)}</span>`:'<span style="color:var(--mut)">-</span>'; }
+function shFill(force){ if(!bCur) return; const key=shKey(bCur.party,bCur.no); if(!force&&bCur.shFor===key) return; bCur.shFor=key;
+  const x=shGet(bCur.party,bCur.no), cities=[...new Set(['',...frCities(),x.f,originOf(bCur.party)])];
+  $('#sh_f').innerHTML=cities.map(c=>`<option value="${esc(c)}">${esc(c)||'-'}</option>`).join(''); $('#sh_f').value=x.f||originOf(bCur.party);
+  $('#sh_s').value=x.s; $('#sh_a').value=x.a; const s=shStat(x); $('#sh_st').textContent=s.t||'Not tracked'; }
+async function shSave(){ if(!bCur) return; const f=$('#sh_f').value, s=$('#sh_s').value, a=$('#sh_a').value;
+  if(a&&s&&a<s) return say('Arrival date is before dispatch date',true);
+  try{ SET=await call('setSettings',{items:[{key:shKey(bCur.party,bCur.no),value:(s||a)?f+'|'+s+'|'+a:''}]}); shFill(true); billsDraw(); say('✓ Shipment saved'); }
+  catch(e){ say('Save failed: '+e.message,true); } }
 async function loadAll(){
   const k='cache_'+API; let c=null; try{ c=JSON.parse(localStorage.getItem(k)); }catch(e){}
   const f=call('getAll').then(d=>{ try{ localStorage.setItem(k,JSON.stringify(d)); }catch(e){} return d; });
-  if(c&&c.parties&&c.mail){ f.then(d=>{ D=d; if(typeof SET!=='undefined') SET=d.settings||{}; mult=d.mult||mult; refresh(); try{ redraw(); loadLedger(); }catch(e){} }).catch(()=>{}); return c; }
+  if(c&&c.parties&&c.mail){ f.then(d=>{ D=d; if(typeof SET!=='undefined') SET=d.settings||{}; mult=d.mult||mult; refresh(); roApply(); try{ redraw(); loadLedger(); }catch(e){} }).catch(()=>{}); return c; }
   return f; }
 let cacheT; function cacheSave(){ clearTimeout(cacheT); cacheT=setTimeout(()=>{ try{ localStorage.setItem('cache_'+API,JSON.stringify(D)); }catch(e){} },1500); }
 async function start(){
-  D=await loadAll(); SET=D.settings||{}; mult=D.mult||4; refresh(); $('#who').textContent='Owner · '+((API.match(/\/s\/([^/]+)/)||[])[1]||'').slice(0,8)+'…';
+  D=await loadAll(); roApply(); SET=D.settings||{}; mult=D.mult||4; refresh(); $('#who').textContent='Owner · '+((API.match(/\/s\/([^/]+)/)||[])[1]||'').slice(0,8)+'…';
   $('#login').classList.add('hide'); $('#app').classList.remove('hide');
   prodSet=new Set(D.products.map(p=>String(p.name).toUpperCase()));
   $('#plist').innerHTML=D.products.map(p=>`<option value="${esc(p.name)}">`).join('');
