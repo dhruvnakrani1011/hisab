@@ -641,7 +641,7 @@ async function photoPick(file){
   $('#ph_f').value='';
 }
 function fillFromPhoto(r,party){
-  const L=[]; (r.items||[]).forEach(x=>L.push({prod:x.code,c:+x.ctn||1,p:+(+x.cbm).toFixed(4)||0,pr:(+x.rate||0)/mult,exp:(+x.ctn||1)*(+x.cbm||0)*(+x.rate||0),amt:+x.amount||0,d:isoD(x.date)}));
+  const L=[]; (r.items||[]).forEach(x=>L.push({prod:x.code,c:+x.ctn||1,p:+(+x.cbm).toFixed(7)||0,pr:(+x.rate||0)/mult,exp:(+x.ctn||1)*(+x.cbm||0)*(+x.rate||0),amt:+x.amount||0,d:isoD(x.date)}));
   (r.transport||[]).forEach(x=>L.push({prod:'BOX',c:+x.ctn||0,p:1,pr:(+x.rate||0)/mult,exp:(+x.ctn||0)*(+x.rate||0),amt:+x.amount||0,d:isoD(x.date)}));
   if(!L.length) return say('No rows found in the photo',true);
   bKind('mail'); $('#bb').innerHTML=''; bAdd(L.length); let bad=0;
@@ -656,7 +656,7 @@ function pasteSheet(){
   const items=[], transport=[], N=v=>parseFloat(String(v||'').replace(/,/g,''))||0; let date='',seen=0,mx=0;
   $('#ps_t').value.replace(/\r/g,'').split('\n').forEach(l=>{
     const dm=l.match(/\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4}/); seen++; let t=l.split('\t').map(x=>x.trim()); if(t.length<12) t=l.trim().split(/\s{2,}|\t/).map(x=>x.trim()); if(t.length<12) t=l.trim().split(/\s+/); if(t.length>mx) mx=t.length;
-    const bn=l.trim().match(/^box\b(.*)$/i); if(bn&&!/transport/i.test(l)){ const ns=(bn[1].match(/\d+(?:\.\d+)?/g)||[]).map(Number); if(ns.length>=2){ transport.push({ctn:ns[0],rate:ns[ns.length-1],amount:0,date}); return; } }
+    const bn=l.trim().replace(/^\S+\s+(?=box\b)/i,'').match(/^box\b(.*)$/i); if(bn&&!/transport/i.test(l)){ const ns=(bn[1].match(/\d+(?:\.\d+)?/g)||[]).map(Number); if(ns.length>=2){ transport.push({ctn:ns[0],rate:ns[ns.length-1],amount:0,date}); return; } }
     { let w=l.trim().split(/\s+/); if(w.length>=5&&/[A-Za-z]/.test(w[0])&&/[A-Za-z]/.test(w[1])&&!isNaN(parseFloat(w[2]))&&!/^box$/i.test(w[0])) w=w.slice(1); const ns=w.slice(1).map(x=>parseFloat(x.replace(/,/g,''))); if(w.length===4&&/[A-Za-z]/.test(w[0])&&!/^box$/i.test(w[0])&&ns.every(x=>x>0)){ items.push({code:w[0],ctn:ns[0],cbm:ns[1],rate:ns[2],amount:0,date}); return; } if(w.length>=5&&w.length<12&&/[A-Za-z]/.test(w[0])&&!/^box$/i.test(w[0])&&ns.slice(0,4).every(x=>x>0)){ items.push({code:w[0],ctn:ns[0],cbm:ns[1]/ns[0],rate:ns[3],amount:0,date}); return; } }
     const tr=l.match(/transport\D*(\d+(?:\.\d+)?)\s*[x\u00D7*]\s*(\d+(?:\.\d+)?)(?:\D+(\d+(?:\.\d+)?))?/i);
     if(tr){ transport.push({ctn:+tr[1],rate:+tr[2],amount:+tr[3]||0,date}); return; }
