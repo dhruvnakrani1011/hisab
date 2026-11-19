@@ -263,7 +263,7 @@ function billOpen(no,party){ bCur={no,party,date:null}; $('#bl_list').classList.
 function billBack(){ bCur=null; $('#bl_det').classList.add('hide'); $('#bl_list').classList.remove('hide'); billsDraw(); }
 function billNew(){ const nm=prompt('Party name (as in Party Master):'); if(nm===null) return; const p=pname(nm); if(!p){ say('Party not found in Party Master. Add the party first (New Entry > + New party).',true); return; }
   bCur={no:nextBill(),party:p,date:null,fresh:true}; $('#bl_list').classList.add('hide'); $('#bl_det').classList.remove('hide'); billDetail(); }
-function billDetail(){
+function billDetail(){ if(!bCur) return;
   const L=D.mail.filter(r=>live(r)&&r.party===bCur.party&&String(r.bill_no||'')===bCur.no).sort((a,b)=>(a.date<b.date?-1:a.date>b.date?1:0)||(a._r-b._r));
   const tot=L.reduce((a,r)=>a+num(r.cartons)*num(r.pcs)*num(r.price)*mult,0);
   $('#bd_t').textContent='Bill '+bCur.no+' · '+bCur.party; $('#bd_s').textContent=L.length?(L.length+' item(s) · Date '+fd(L[0].date)):'New bill. Add the first item below.';
@@ -274,7 +274,7 @@ async function billAdd(){
   const date=$('#ba_d').value, pn=$('#ba_p').value.trim(); if(!date||!pn) return say('Enter date and product',true);
   const row={date,party:bCur.party,product:pn,cartons:+$('#ba_c').value||0,pcs:+$('#ba_pc').value||0,price:+$('#ba_pr').value||0,bill_no:bCur.no};
   say('Saving...');
-  try{ const saved=await call('addMany',{sheet:'Mail',rows:[row]}); D.mail.push(...saved);
+  try{ const saved=await addSafe('Mail',[row]); D.mail.push(...saved);
     if(!prodSet.has(pn.toUpperCase())){ try{ const pr=await call('add',{sheet:'Products',row:{name:pn}}); D.products.push(pr); prodSet.add(pn.toUpperCase()); $('#plist').insertAdjacentHTML('beforeend',`<option value="${esc(pn)}">`); }catch(e){} }
     refresh(); queueSync(bCur.party); ['ba_p','ba_c','ba_pc','ba_pr'].forEach(i=>$('#'+i).value=''); billDetail(); say('✓ Item added to bill '+bCur.no); $('#ba_p').focus();
   }catch(e){ say('Save failed: '+e.message,true); }
@@ -297,16 +297,17 @@ function listGroup(L){ const first=new Map(), g=new Map(); L.forEach((r,i)=>{ if
     out.push({kind:'BILL',bill:r.bill,party:r.party,id:it[0].id,n:it.length,date:it.map(x=>x.date).sort()[0],amt:it.reduce((a,x)=>a+x.amt,0),note:'',c:r.c}); } else out.push(r); }); return out; }
 function billEdit(bn,party){ tab('bil'); billOpen(bn,party); }
 async function billDate(){
-  const nd=$('#bd_dt').value; if(!nd||!bCur) return say('Select the new date',true);
-  const it=D.mail.filter(r=>live(r)&&r.party===bCur.party&&String(r.bill_no||'')===bCur.no); if(!it.length) return;
-  if(!confirm('Change date of all '+it.length+' item(s) of bill '+bCur.no+' to '+fd(nd)+'?')) return;
-  try{ for(const r of it){ await upd('MAIL',r.id,{date:nd}); } $('#bd_dt').value=''; $('#ba_d').value=nd; billDetail(); redraw(); loadLedger(); say('\u2713 Bill date changed to '+fd(nd)); }
-  catch(e){ say(e.message,true); } }
+  const bc=bCur, nd=$('#bd_dt').value; if(!bc) return say('Open a bill first',true); if(!nd) return say('Select the new date',true);
+  const it=D.mail.filter(r=>live(r)&&r.party===bc.party&&String(r.bill_no||'')===bc.no); if(!it.length) return;
+  if(!confirm('Change date of all '+it.length+' item(s) of bill '+bc.no+' to '+fd(nd)+'?')) return;
+  let ok=0; try{ const rows=await call('updateMany',{sheet:SHEET.MAIL,items:it.map(r=>({id:r.id,patch:{date:nd}}))}); rows.forEach(n=>{ const i=D.mail.findIndex(x=>x.id===n.id); if(i>=0) D.mail[i]={...D.mail[i],...n}; ok++; }); refresh(); queueSync(bc.party); redraw(); }catch(e){ say(e.message,true); }
+  bCur=bc; $('#bd_dt').value=''; $('#ba_d').value=nd; try{ billDetail(); }catch(e){} loadLedger();
+  say(ok===it.length?'\u2713 Bill date changed to '+fd(nd):ok+' of '+it.length+' updated, please retry',ok!==it.length); }
 async function delBill(bn,party){ const it=D.mail.filter(r=>live(r)&&r.party===party&&String(r.bill_no||'')===bn); if(!it.length) return;
   if(!confirm('Delete whole bill '+bn+' ('+it.length+' item'+(it.length>1?'s':'')+')? A copy is kept in the "Deleted Log" tab.')) return;
-  try{ for(const r of it){ await call('delete',{sheet:SHEET.MAIL,id:r.id}); } const ids=new Set(it.map(r=>r.id)); D.mail=D.mail.filter(r=>!ids.has(r.id)); refresh(); queueSync(party); redraw(); loadLedger(); say('✓ Bill '+bn+' deleted'); }
+  try{ await call('deleteMany',{sheet:SHEET.MAIL,ids:it.map(r=>r.id)}); const ids=new Set(it.map(r=>r.id)); D.mail=D.mail.filter(r=>!ids.has(r.id)); refresh(); queueSync(party); redraw(); loadLedger(); say('✓ Bill '+bn+' deleted'); }
   catch(e){ say(e.message,true); } }
-async function markBill(bn,party,on){ const it=D.mail.filter(r=>live(r)&&r.party===party&&String(r.bill_no||'')===bn); for(const r of it){ await upd('MAIL',r.id,{matched_at:on?'':nowIso()}); } loadLedger(); }
+async function markBill(bn,party,on){ const it=D.mail.filter(r=>live(r)&&r.party===party&&String(r.bill_no||'')===bn); try{ const v=on?'':nowIso(); const rows=await call('updateMany',{sheet:SHEET.MAIL,items:it.map(r=>({id:r.id,patch:{matched_at:v}}))}); rows.forEach(n=>{ const i=D.mail.findIndex(x=>x.id===n.id); if(i>=0) D.mail[i]={...D.mail[i],...n}; }); refresh(); queueSync(party); redraw(); }catch(e){ say(e.message,true); } loadLedger(); }
 
 // ---------- Canvas drawing shim (same drawing calls as pdf-lib) -> PNG image
 const CVLIB=(function(){ const S=2, mc=document.createElement('canvas').getContext('2d'), css=c=>'rgb('+Math.round(c.r*255)+','+Math.round(c.g*255)+','+Math.round(c.b*255)+')';
@@ -333,7 +334,7 @@ function ledgerRows(D,mult,name,opening){
   let p=opening; o.forEach(r=>{p+=r.total-r.payment; r.pending=p;}); return o;
 }
 //CALC-END
-const DEFAULT_URL="https://script.google.com/macros/s/AKfycbwuwOysNPvFRChOc9EpMWhiXsMrU0RW0J91EKtjdxfQTVRw2E8BMJWEVtwYAgGvNQZj6w/exec"; // optional: paste your Web App URL here so it is never asked again
+const DEFAULT_URL="https://script.google.com/macros/s/AKfycbzySSMD_bNSFjsqe56VyC3tSNaTO7eqJfzOf9ZxHxnRnBIXXLD_cgKirj3El6sRtO11YQ/exec"; // optional: paste your Web App URL here so it is never asked again
 let imgs={}; const IU=n=>imgs[String(n).trim().toUpperCase()]||'';
 const thumb=(n,edit)=>{ const u=IU(n); return u?`<img class="th" loading="lazy" src="${esc(u)}" alt="" onerror="this.style.display='none'">`:(edit?`<span class="th th0" title="Add image" data-n="${esc(n)}" onclick="setImg(this.dataset.n)">+</span>`:''); };
 let API=localStorage.getItem('gs_url')||DEFAULT_URL, KEY=localStorage.getItem('gs_key')||'';
@@ -360,14 +361,48 @@ function tab(t){ document.querySelectorAll('.tab').forEach(e=>e.classList.add('h
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{ const t=b.dataset.t; tab(t); if(t==='bil'){ bCur=null; $('#bl_det').classList.add('hide'); $('#bl_list').classList.remove('hide'); billsDraw(); }
   if(t==='sum') drawSummary(); if(t==='lst'){ if(!$('#lf_from').value) listRange(0); else drawList(); } if(t==='blk'&&!$('#bb').children.length) bInit(); if(t==='ana') anaRange(anaR); });
 
+
+// ---- Offline-safe saving: entries are queued on this device when internet is down and uploaded later (server skips duplicates by id)
+const QK=()=>'pendq_'+API;
+function qGet(){ try{ return JSON.parse(localStorage.getItem(QK())||'[]'); }catch(e){ return []; } }
+function qSet(q){ try{ localStorage.setItem(QK(),JSON.stringify(q)); }catch(e){} qShow(); }
+function qShow(){ const n=qGet().reduce((a,b)=>a+b.rows.length,0); if(n) setSync('\u26A0 '+n+' entr'+(n>1?'ies':'y')+' waiting for internet',true); }
+const uid=()=>(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('x'+Date.now().toString(36)+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2));
+const isNet=e=>/Could not reach|taking too long/.test(String(e&&e.message));
+async function addSafe(sheet,rows){
+  rows=rows.map(r=>({...r,id:r.id||uid()}));
+  try{ return await call('addMany',{sheet,rows}); }
+  catch(e){ if(!isNet(e)) throw e;
+    const q=qGet(); q.push({sheet,rows}); qSet(q);
+    setTimeout(()=>say('Internet problem: '+rows.length+' entr'+(rows.length>1?'ies':'y')+' stored on this device. They upload automatically when internet is back.',true),80);
+    return rows.map((r,i)=>({...r,created_at:nowIso(),_r:0,_q:1,total:(+r.cartons||0)*(+r.pcs||0)*(+r.price||0)*mult})); }
+}
+let qBusy=false;
+async function flushQ(){
+  if(qBusy) return; let q=qGet(); if(!q.length) return; qBusy=true;
+  try{ while(q.length){ const b=q[0]; let saved;
+      try{ saved=await call('addMany',{sheet:b.sheet,rows:b.rows}); }catch(e){ if(isNet(e)) break; throw e; }
+      const L=D[{Mail:'mail',Payments:'pay',Extra:'ext'}[b.sheet]]; saved.forEach(n=>{ const i=L.findIndex(x=>x.id===n.id); if(i>=0) L[i]={...L[i],...n,_q:0}; });
+      q.shift(); qSet(q); refresh(); queueSync([...new Set(b.rows.map(r=>r.party))]); try{ redraw(); loadLedger(); }catch(e){} }
+    if(!q.length) setSync('\u2713 Pending entries uploaded'); }
+  catch(e){ setSync('Upload of pending entries failed: '+e.message,true); }
+  qBusy=false;
+}
+window.addEventListener('online',()=>setTimeout(flushQ,1000)); setInterval(()=>{ if(qGet().length) flushQ(); },30000);
+async function loadAll(){
+  const k='cache_'+API; let c=null; try{ c=JSON.parse(localStorage.getItem(k)); }catch(e){}
+  const f=call('getAll').then(d=>{ try{ localStorage.setItem(k,JSON.stringify(d)); }catch(e){} return d; });
+  if(c&&c.parties&&c.mail){ f.then(d=>{ D=d; if(typeof SET!=='undefined') SET=d.settings||{}; mult=d.mult||mult; refresh(); try{ redraw(); loadLedger(); }catch(e){} }).catch(()=>{}); return c; }
+  return f; }
+let cacheT; function cacheSave(){ clearTimeout(cacheT); cacheT=setTimeout(()=>{ try{ localStorage.setItem('cache_'+API,JSON.stringify(D)); }catch(e){} },1500); }
 async function start(){
-  D=await call('getAll'); SET=D.settings||{}; mult=D.mult||4; refresh(); $('#who').textContent='Owner · '+((API.match(/\/s\/([^/]+)/)||[])[1]||'').slice(0,8)+'…';
+  D=await loadAll(); SET=D.settings||{}; mult=D.mult||4; refresh(); $('#who').textContent='Owner · '+((API.match(/\/s\/([^/]+)/)||[])[1]||'').slice(0,8)+'…';
   $('#login').classList.add('hide'); $('#app').classList.remove('hide');
   prodSet=new Set(D.products.map(p=>String(p.name).toUpperCase()));
   $('#plist').innerHTML=D.products.map(p=>`<option value="${esc(p.name)}">`).join('');
-  $('#f_date').valueAsDate=new Date(); kindUI(); tab('sum'); drawSummary();
+  $('#f_date').valueAsDate=new Date(); kindUI(); tab('sum'); drawSummary(); qShow(); setTimeout(flushQ,1500);
 }
-function refresh(){ setTimeout(bnoFill,0); imgs={}; D.products.forEach(p=>{ if(p.image) imgs[String(p.name).trim().toUpperCase()]=p.image; }); parties=calc(D,mult); $('#plist2').innerHTML=parties.map(p=>`<option value="${esc(p.party_name)}">`).join(''); }
+function refresh(){ cacheSave(); setTimeout(bnoFill,0); imgs={}; D.products.forEach(p=>{ if(p.image) imgs[String(p.name).trim().toUpperCase()]=p.image; }); parties=calc(D,mult); $('#plist2').innerHTML=parties.map(p=>`<option value="${esc(p.party_name)}">`).join(''); }
 
 const sS={k:'party_name',dir:1}, lS={k:'',dir:1}, lG={k:'',dir:1}, aP={k:'',dir:-1}, aQ={k:'',dir:-1};
 const cmpv=(a,b,k)=>typeof a[k]==='string'||typeof b[k]==='string'?String(a[k]||'').localeCompare(String(b[k]||'')):(a[k]||0)-(b[k]||0);
@@ -504,7 +539,7 @@ async function saveEntry(){
     rows=[{date,party,charge_type:$('#f_ct').value,amount:a,remark:rem}]; }
   say('Saving...');
   try{
-    const saved=await call('addMany',{sheet,rows}); D[{Mail:'mail',Payments:'pay',Extra:'ext'}[sheet]].push(...saved);
+    const saved=await addSafe(sheet,rows); D[{Mail:'mail',Payments:'pay',Extra:'ext'}[sheet]].push(...saved);
     let extra=''; const row=rows[0];
     if(k==='mail'&&!prodSet.has(row.product.toUpperCase())){
       try{ const pr=await call('add',{sheet:'Products',row:{name:row.product}}); D.products.push(pr); prodSet.add(row.product.toUpperCase()); $('#plist').insertAdjacentHTML('beforeend',`<option value="${esc(row.product)}">`); extra=' \u00B7 new product added to Product Master'; }catch(e){ extra=' \u00B7 (could not add product to Product Master)'; }
@@ -644,7 +679,7 @@ async function bSave(){
   say('Saving '+rows.length+' entries...');
   try{
     if(unk.size){ const ps=await call('addMany',{sheet:'Parties',rows:[...unk].map(name=>({name,opening_balance:0}))}); D.parties.push(...ps); }
-    const saved=await call('addMany',{sheet:bk==='mail'?'Mail':'Payments',rows}); D[bk==='mail'?'mail':'pay'].push(...saved);
+    const saved=await addSafe(bk==='mail'?'Mail':'Payments',rows); D[bk==='mail'?'mail':'pay'].push(...saved);
     let np=0;
     if(bk==='mail'){ const m=new Map(); rows.forEach(r=>{ if(!prodSet.has(r.product.toUpperCase())) m.set(r.product.toUpperCase(),r.product); });
       if(m.size){ try{ const pr=await call('addMany',{sheet:'Products',rows:[...m.values()].map(name=>({name}))}); D.products.push(...pr);
