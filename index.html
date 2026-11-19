@@ -142,7 +142,7 @@ select option{color:#0f172a;background:#fff;-webkit-text-fill-color:#0f172a}
 <div id="bl_list"><div class="card bar noprint"><div style="flex:1"><label>Search bill no. / party</label><input id="bl_q" placeholder="e.g. B0001 or party name" oninput="billsDraw()"></div><button class="pri" onclick="billNew()">+ New bill</button></div>
 <div class="card wrap"><table><thead><tr><th>Bill no.</th><th>Date</th><th>Party</th><th class="n">Items</th><th class="n">Bill total</th><th></th></tr></thead><tbody id="bl_b"></tbody></table></div></div>
 <div id="bl_det" class="hide"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><button class="btn" onclick="billBack()">&larr; All bills</button></div><div><button class="btn" onclick="billPdf(bCur.no,bCur.party)">Download Bill PDF</button> <button class="btn" onclick="billPdf(bCur.no,bCur.party,false,true)">Download Image</button></div></div>
-<h3 id="bd_t" style="margin:14px 0 4px"></h3><div id="bd_s" style="color:var(--mut);font-size:13px;margin-bottom:12px"></div>
+<h3 id="bd_t" style="margin:14px 0 4px"></h3><div id="bd_s" style="color:var(--mut);font-size:13px;margin-bottom:8px"></div><div id="bd_dw" style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap"><label style="font-size:13px">Change date of whole bill:</label><input type="date" id="bd_dt" style="width:170px"><button class="btn" onclick="billDate()">Change date</button></div>
 <div class="wrap" style="max-height:340px;overflow:auto"><table class="at" style="min-width:0"><thead><tr><th>Product</th><th class="n">Cartons</th><th class="n">Pcs / Carton</th><th class="n">Price</th><th class="n">Total</th><th></th></tr></thead><tbody id="bd_b"></tbody></table></div>
 <div style="text-align:right;margin-top:10px;font-size:16px"><b id="bd_tot"></b></div></div>
 <div class="card"><b>Add item to this bill</b><div class="grid" style="margin-top:8px"><div><label>Date</label><input id="ba_d" type="date"></div><div><label>Product</label><input id="ba_p" list="plist" autocomplete="off" placeholder="Search or type product"></div></div>
@@ -296,6 +296,12 @@ function listGroup(L){ const first=new Map(), g=new Map(); L.forEach((r,i)=>{ if
   const out=[]; L.forEach((r,i)=>{ if(r.kind==='MAIL'&&r.bill){ const k=r.party+'\u0001'+r.bill; if(first.get(k)!==i) return; const it=g.get(k);
     out.push({kind:'BILL',bill:r.bill,party:r.party,id:it[0].id,n:it.length,date:it.map(x=>x.date).sort()[0],amt:it.reduce((a,x)=>a+x.amt,0),note:'',c:r.c}); } else out.push(r); }); return out; }
 function billEdit(bn,party){ tab('bil'); billOpen(bn,party); }
+async function billDate(){
+  const nd=$('#bd_dt').value; if(!nd||!bCur) return say('Select the new date',true);
+  const it=D.mail.filter(r=>live(r)&&r.party===bCur.party&&String(r.bill_no||'')===bCur.no); if(!it.length) return;
+  if(!confirm('Change date of all '+it.length+' item(s) of bill '+bCur.no+' to '+fd(nd)+'?')) return;
+  try{ for(const r of it){ await upd('MAIL',r.id,{date:nd}); } $('#bd_dt').value=''; $('#ba_d').value=nd; billDetail(); redraw(); loadLedger(); say('\u2713 Bill date changed to '+fd(nd)); }
+  catch(e){ say(e.message,true); } }
 async function delBill(bn,party){ const it=D.mail.filter(r=>live(r)&&r.party===party&&String(r.bill_no||'')===bn); if(!it.length) return;
   if(!confirm('Delete whole bill '+bn+' ('+it.length+' item'+(it.length>1?'s':'')+')? A copy is kept in the "Deleted Log" tab.')) return;
   try{ for(const r of it){ await call('delete',{sheet:SHEET.MAIL,id:r.id}); } const ids=new Set(it.map(r=>r.id)); D.mail=D.mail.filter(r=>!ids.has(r.id)); refresh(); queueSync(party); redraw(); loadLedger(); say('✓ Bill '+bn+' deleted'); }
